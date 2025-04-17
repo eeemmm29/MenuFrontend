@@ -7,20 +7,26 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     Credentials({
       // You can specify which fields should be submitted, by adding keys to the `credentials` object.
       // e.g. domain, username, password, 2FA token, etc.
-      name: "Credentials",
+      name: "credentials",
       credentials: {
-        email: { label: "Email", type: "text" },
+        username: { label: "Username", type: "text" },
         password: { label: "Password", type: "password" },
       },
       authorize: async (credentials) => {
-        const res = await axios({
-          url: process.env.NEXT_PUBLIC_BACKEND_URL + "auth/login",
-          method: "post",
-          data: credentials,
-        });
+        const res = await axios.post(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/login`,
+          {
+            username: credentials.username,
+            password: credentials.password,
+          }
+        );
         if (res.data?.access) {
           // Return the user object along with the tokens.
-          return res.data;
+          return {
+            ...res.data.user,
+            access: res.data.access,
+            refresh: res.data.refresh,
+          };
         }
         return null;
       },
@@ -41,10 +47,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return token;
     },
     session: async ({ session, token }) => {
-      // session.user = token.user;
+      session.user = token.user;
       session.access = token.access;
       session.refresh = token.refresh;
       return session;
     },
+  },
+  pages: {
+    signIn: "/auth/login", // your custom login page
+    error: "/auth/error", // error display page
   },
 });
