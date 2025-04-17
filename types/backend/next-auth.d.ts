@@ -10,8 +10,10 @@ declare module "next-auth" {
   interface CustomUser {
     id?: string;
     username?: string;
-    access?: string;
-    refresh?: string;
+    access: string;
+    refresh: string;
+    accessExpiration: string;
+    refreshExpiration: string;
   }
 
   interface User extends DefaultUser, CustomUser {}
@@ -24,7 +26,9 @@ declare module "next-auth/jwt" {
   /** Returned by the `jwt` callback and `auth`, when using JWT sessions */
   interface JWT {
     user?: CustomUser;
-    access?: string;
-    refresh?: string;
+    access: string;
+    refresh: string;
+    accessExpiration: number;
+    refreshExpiration: number;
   }
 }
