@@ -14,7 +14,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
       authorize: async (credentials) => {
         const res = await axios({
-          url: process.env.NEXT_PUBLIC_BACKEND_URL + "auth/login/",
+          url: process.env.NEXT_PUBLIC_BACKEND_URL + "auth/login",
           method: "post",
           data: credentials,
         });
