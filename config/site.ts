@@ -1,3 +1,5 @@
+import { routes } from "./routes";
+
 export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {
@@ -6,7 +8,7 @@ export const siteConfig = {
   navItems: [
     {
       label: "Home",
-      href: "/",
+      href: routes.home,
     },
     // {
     //   label: "Docs",
@@ -22,41 +24,41 @@ export const siteConfig = {
     // },
     {
       label: "About",
-      href: "/about",
+      href: routes.about,
     },
   ],
   navMenuItems: [
     {
       label: "Profile",
-      href: "/profile",
+      href: routes.profile,
     },
     {
       label: "Dashboard",
-      href: "/dashboard",
+      href: routes.dashboard,
     },
     {
       label: "Projects",
-      href: "/projects",
+      href: routes.projects,
     },
     {
       label: "Team",
-      href: "/team",
+      href: routes.team,
     },
     {
       label: "Calendar",
-      href: "/calendar",
+      href: routes.calendar,
     },
     {
       label: "Settings",
-      href: "/settings",
+      href: routes.settings,
     },
     {
       label: "Help & Feedback",
-      href: "/help-feedback",
+      href: routes.helpFeedback,
     },
     {
       label: "Logout",
-      href: "/logout",
+      href: routes.logout,
     },
   ],
   links: {

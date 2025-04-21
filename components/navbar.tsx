@@ -1,42 +1,34 @@
 "use client";
 
+import { GithubIcon } from "@/components/icons";
+import { ThemeSwitch } from "@/components/theme-switch";
+import { routes } from "@/config/routes";
+import { siteConfig } from "@/config/site";
+import { Button } from "@heroui/button";
+import { Link } from "@heroui/link";
 import {
   Navbar as HeroUINavbar,
-  NavbarContent,
-  NavbarMenu,
-  NavbarMenuToggle,
   NavbarBrand,
+  NavbarContent,
   NavbarItem,
+  NavbarMenu,
   NavbarMenuItem,
+  NavbarMenuToggle,
 } from "@heroui/navbar";
-import { Button } from "@heroui/button";
-import { Kbd } from "@heroui/kbd";
-import { Link } from "@heroui/link";
-import { Input } from "@heroui/input";
 import {
   Avatar,
   Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
   DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
 } from "@heroui/react";
 import { link as linkStyles } from "@heroui/theme";
-import NextLink from "next/link";
 import clsx from "clsx";
-import { useSession, signIn, signOut } from "next-auth/react"; // Import Auth.js hooks
-import { siteConfig } from "@/config/site";
-import { ThemeSwitch } from "@/components/theme-switch";
-import {
-  TwitterIcon,
-  GithubIcon,
-  DiscordIcon,
-  HeartFilledIcon,
-  SearchIcon,
-  Logo,
-} from "@/components/icons";
+import { signOut, useSession } from "next-auth/react";
+import NextLink from "next/link";
 
 export const Navbar = () => {
-  const { data: session, status } = useSession(); // Get session data and status
+  const { data: session, status } = useSession();
   // const searchInput = (
   //   <Input
   //     aria-label="Search"
@@ -62,7 +54,10 @@ export const Navbar = () => {
     <HeroUINavbar maxWidth="xl" position="sticky">
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand className="gap-3 max-w-fit">
-          <NextLink className="flex justify-start items-center gap-1" href="/">
+          <NextLink
+            className="flex justify-start items-center gap-1"
+            href={routes.home}
+          >
             {/* <Logo /> */}
             <p className="font-bold text-inherit">RMMS</p>
           </NextLink>
@@ -110,7 +105,11 @@ export const Navbar = () => {
                   <DropdownItem key="profile" className="h-14 gap-2">
                     {`Signed in as ${session.user?.username || session.user?.email}`}
                   </DropdownItem>
-                  <DropdownItem key="settings" as={NextLink} href="/profile">
+                  <DropdownItem
+                    key="settings"
+                    as={NextLink}
+                    href={routes.profile}
+                  >
                     My Profile
                   </DropdownItem>
                   <DropdownItem
@@ -124,13 +123,13 @@ export const Navbar = () => {
               </Dropdown>
             ) : (
               <>
-                <Button as={NextLink} href="/auth/login" variant="flat">
+                <Button as={NextLink} href={routes.auth.login} variant="flat">
                   Login
                 </Button>
                 <Button
                   as={NextLink}
                   color="primary"
-                  href="/auth/signup"
+                  href={routes.auth.signup}
                   variant="flat"
                 >
                   Sign Up
