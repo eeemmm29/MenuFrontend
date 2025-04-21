@@ -1,45 +1,47 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { useState } from "react";
+import { useForm } from "react-hook-form";
 
 export default function LoginPage() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const onSubmit = async (data: any) => {
     const result = await signIn("credentials", {
       redirect: false,
-      username,
-      password,
+      username: data.username,
+      password: data.password,
     });
 
     if (result?.error) {
-      // Handle error (e.g., display a message)
       console.error("Authentication error:", result.error);
     } else {
-      // Redirect or update UI upon successful sign-in
       window.location.href = "/";
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <input
         type="text"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
+        {...register("username", { required: "Username is required" })}
         placeholder="Username"
-        required
       />
+      {errors.username && (
+        <p style={{ color: "red" }}>{errors.username.message?.toString()}</p>
+      )}
       <input
         type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
+        {...register("password", { required: "Password is required" })}
         placeholder="Password"
-        required
       />
+      {errors.password && (
+        <p style={{ color: "red" }}>{errors.password.message?.toString()}</p>
+      )}
       <button type="submit">Sign In</button>
     </form>
   );

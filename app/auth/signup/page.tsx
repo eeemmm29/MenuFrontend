@@ -1,58 +1,47 @@
 "use client";
 
-import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { signIn } from "next-auth/react";
 import axios from "axios";
 
 export default function SignUpPage() {
-  const [form, setForm] = useState({
-    username: "",
-    password1: "",
-    password2: "",
-  });
-  const [error, setError] = useState<Record<string, string>>({});
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError({});
-
+  const onSubmit = async (data: any) => {
     try {
       await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/register/`,
-        form
+        data
       );
 
       // Automatically sign in the user after successful registration
       await signIn("credentials", {
-        username: form.username,
-        password: form.password1,
+        username: data.username,
+        password: data.password1,
         callbackUrl: "/",
       });
     } catch (err: any) {
-      setError(err.response?.data || {});
+      console.error(err.response?.data || {});
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <h1>Sign Up</h1>
-      {Object.keys(error).map((key) => (
+      {Object.keys(errors).map((key) => (
         <p key={key} style={{ color: "red" }}>
-          {error[key]}
+          {errors[key]?.message?.toString()}
         </p>
       ))}
       <label>
         Username:
         <input
           type="text"
-          name="username"
-          value={form.username}
-          onChange={handleChange}
-          required
+          {...register("username", { required: "Username is required" })}
         />
       </label>
       <br />
@@ -60,10 +49,7 @@ export default function SignUpPage() {
         Password:
         <input
           type="password"
-          name="password1"
-          value={form.password1}
-          onChange={handleChange}
-          required
+          {...register("password1", { required: "Password is required" })}
         />
       </label>
       <br />
@@ -71,10 +57,9 @@ export default function SignUpPage() {
         Confirm Password:
         <input
           type="password"
-          name="password2"
-          value={form.password2}
-          onChange={handleChange}
-          required
+          {...register("password2", {
+            required: "Confirm Password is required",
+          })}
         />
       </label>
       <br />
