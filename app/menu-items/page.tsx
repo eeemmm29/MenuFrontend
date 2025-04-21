@@ -1,16 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { MenuItem } from "@/types/backend/menuItems";
+import { getMenuItems } from "@/utils/backend/menuItems";
 import { useRouter } from "next/navigation";
-
-interface MenuItem {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  category: number;
-  image?: string;
-}
+import { useEffect, useState } from "react";
 
 export default function MenuItems() {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
@@ -22,9 +15,8 @@ export default function MenuItems() {
 
   const fetchMenuItems = async () => {
     try {
-      const response = await fetch("http://localhost:8000/api/menu-items/");
-      const data = await response.json();
-      setMenuItems(data);
+      const response = await getMenuItems();
+      setMenuItems(response.results);
     } catch (error) {
       console.error("Error fetching menu items:", error);
     }

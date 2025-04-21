@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { getCategories } from "@/utils/backend/categories";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 interface Category {
   id: number;
@@ -19,9 +20,8 @@ export default function Categories() {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch("http://localhost:8000/api/categories/");
-      const data = await response.json();
-      setCategories(data);
+      const response = await getCategories();
+      setCategories(response.results);
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
