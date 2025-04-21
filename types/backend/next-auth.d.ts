@@ -14,6 +14,7 @@ declare module "next-auth" {
     refresh: string;
     accessExpiration: string;
     refreshExpiration: string;
+    isAdmin?: boolean;
   }
 
   interface User extends DefaultUser, CustomUser {}
