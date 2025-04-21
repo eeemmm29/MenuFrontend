@@ -4,7 +4,15 @@ import { GithubIcon } from "@/components/icons";
 import { ThemeSwitch } from "@/components/theme-switch";
 import { routes } from "@/config/routes";
 import { siteConfig } from "@/config/site";
+import { Avatar } from "@heroui/avatar";
 import { Button } from "@heroui/button";
+import { Chip } from "@heroui/chip";
+import {
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+} from "@heroui/dropdown";
 import { Link } from "@heroui/link";
 import {
   Navbar as HeroUINavbar,
@@ -15,13 +23,7 @@ import {
   NavbarMenuItem,
   NavbarMenuToggle,
 } from "@heroui/navbar";
-import {
-  Avatar,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-} from "@heroui/react";
+import { Spacer } from "@heroui/spacer";
 import { link as linkStyles } from "@heroui/theme";
 import clsx from "clsx";
 import { signOut, useSession } from "next-auth/react";
@@ -102,8 +104,14 @@ export const Navbar = () => {
                   />
                 </DropdownTrigger>
                 <DropdownMenu aria-label="Profile Actions" variant="flat">
-                  <DropdownItem key="profile" className="h-14 gap-2">
+                  <DropdownItem key="profile" className="h-14">
                     {`Signed in as ${session.user?.username || session.user?.email}`}
+                    <Spacer />
+                    {session.user?.isAdmin && (
+                      <Chip size="sm" color="success">
+                        Admin
+                      </Chip>
+                    )}
                   </DropdownItem>
                   <DropdownItem
                     key="settings"
