@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Navbar as HeroUINavbar,
   NavbarContent,
@@ -11,10 +13,17 @@ import { Button } from "@heroui/button";
 import { Kbd } from "@heroui/kbd";
 import { Link } from "@heroui/link";
 import { Input } from "@heroui/input";
+import {
+  Avatar,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+} from "@heroui/react";
 import { link as linkStyles } from "@heroui/theme";
 import NextLink from "next/link";
 import clsx from "clsx";
-
+import { useSession, signIn, signOut } from "next-auth/react"; // Import Auth.js hooks
 import { siteConfig } from "@/config/site";
 import { ThemeSwitch } from "@/components/theme-switch";
 import {
@@ -27,6 +36,7 @@ import {
 } from "@/components/icons";
 
 export const Navbar = () => {
+  const { data: session, status } = useSession(); // Get session data and status
   // const searchInput = (
   //   <Input
   //     aria-label="Search"
@@ -51,7 +61,7 @@ export const Navbar = () => {
   return (
     <HeroUINavbar maxWidth="xl" position="sticky">
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
-        <NavbarBrand as="li" className="gap-3 max-w-fit">
+        <NavbarBrand className="gap-3 max-w-fit">
           <NextLink className="flex justify-start items-center gap-1" href="/">
             {/* <Logo /> */}
             <p className="font-bold text-inherit">RMMS</p>
@@ -80,6 +90,64 @@ export const Navbar = () => {
         justify="end"
       >
         <NavbarItem className="hidden sm:flex gap-2">
+          {status != "loading" &&
+            (status === "authenticated" ? (
+              <Dropdown placement="bottom-end">
+                <DropdownTrigger>
+                  <Avatar
+                    isBordered
+                    as="button"
+                    className="transition-transform"
+                    color="secondary"
+                    name={
+                      session.user?.username || session.user?.email || "User"
+                    }
+                    size="sm"
+                    src={session.user?.image || undefined} // Use user image if available
+                  />
+                </DropdownTrigger>
+                <DropdownMenu aria-label="Profile Actions" variant="flat">
+                  <DropdownItem key="profile" className="h-14 gap-2">
+                    {`Signed in as ${session.user?.username || session.user?.email}`}
+                  </DropdownItem>
+                  <DropdownItem key="settings" as={NextLink} href="/profile">
+                    My Profile
+                  </DropdownItem>
+                  <DropdownItem
+                    key="logout"
+                    color="danger"
+                    onPress={() => signOut()}
+                  >
+                    Log Out
+                  </DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
+            ) : (
+              <>
+                <NavbarItem className="hidden md:flex">
+                  <Button
+                    as={NextLink}
+                    color="default"
+                    href="/auth/login"
+                    variant="flat"
+                  >
+                    Login
+                  </Button>
+                </NavbarItem>
+                <NavbarItem className="hidden md:flex">
+                  {/* Assuming you have a signup page at /auth/signup */}
+                  {/* If using Auth.js default pages, signin handles both */}
+                  <Button
+                    as={NextLink}
+                    color="primary"
+                    href="/auth/signup"
+                    variant="flat"
+                  >
+                    Sign Up
+                  </Button>
+                </NavbarItem>
+              </>
+            ))}
           {/* <Link isExternal aria-label="Twitter" href={siteConfig.links.twitter}>
             <TwitterIcon className="text-default-500" />
           </Link>
