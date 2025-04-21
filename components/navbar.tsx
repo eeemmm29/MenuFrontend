@@ -124,28 +124,17 @@ export const Navbar = () => {
               </Dropdown>
             ) : (
               <>
-                <NavbarItem className="hidden md:flex">
-                  <Button
-                    as={NextLink}
-                    color="default"
-                    href="/auth/login"
-                    variant="flat"
-                  >
-                    Login
-                  </Button>
-                </NavbarItem>
-                <NavbarItem className="hidden md:flex">
-                  {/* Assuming you have a signup page at /auth/signup */}
-                  {/* If using Auth.js default pages, signin handles both */}
-                  <Button
-                    as={NextLink}
-                    color="primary"
-                    href="/auth/signup"
-                    variant="flat"
-                  >
-                    Sign Up
-                  </Button>
-                </NavbarItem>
+                <Button as={NextLink} href="/auth/login" variant="flat">
+                  Login
+                </Button>
+                <Button
+                  as={NextLink}
+                  color="primary"
+                  href="/auth/signup"
+                  variant="flat"
+                >
+                  Sign Up
+                </Button>
               </>
             ))}
           {/* <Link isExternal aria-label="Twitter" href={siteConfig.links.twitter}>
