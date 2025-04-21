@@ -104,14 +104,18 @@ export const Navbar = () => {
                   />
                 </DropdownTrigger>
                 <DropdownMenu aria-label="Profile Actions" variant="flat">
-                  <DropdownItem key="profile" className="h-14">
+                  <DropdownItem
+                    key="profile"
+                    className="h-14"
+                    description={
+                      session.user?.isAdmin && (
+                        <Chip size="sm" color="success" className="mt-1">
+                          Admin
+                        </Chip>
+                      )
+                    }
+                  >
                     {`Signed in as ${session.user?.username || session.user?.email}`}
-                    <Spacer />
-                    {session.user?.isAdmin && (
-                      <Chip size="sm" color="success">
-                        Admin
-                      </Chip>
-                    )}
                   </DropdownItem>
                   <DropdownItem
                     key="settings"
