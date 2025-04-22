@@ -1,3 +1,5 @@
+import { routes } from "./routes";
+
 export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {
@@ -6,7 +8,7 @@ export const siteConfig = {
   navItems: [
     {
       label: "Home",
-      href: "/",
+      href: routes.home,
     },
     // {
     //   label: "Docs",
@@ -22,45 +24,76 @@ export const siteConfig = {
     // },
     {
       label: "About",
-      href: "/about",
+      href: routes.about,
+    },
+    {
+      label: "Categories",
+      href: routes.categories,
+    },
+    {
+      label: "Menu Items",
+      href: routes.menuItems,
+    },
+    {
+      label: "Favorites",
+      href: routes.favorites,
     },
   ],
   navMenuItems: [
     {
+      label: "About",
+      href: routes.about,
+    },
+    {
       label: "Profile",
-      href: "/profile",
+      href: routes.profile,
+      protected: true,
+    },
+    // {
+    //   label: "Dashboard",
+    //   href: routes.dashboard,
+    // },
+    // {
+    //   label: "Projects",
+    //   href: routes.projects,
+    // },
+    // {
+    //   label: "Team",
+    //   href: routes.team,
+    // },
+    // {
+    //   label: "Calendar",
+    //   href: routes.calendar,
+    // },
+    // {
+    //   label: "Settings",
+    //   href: routes.settings,
+    // },
+    // {
+    //   label: "Help & Feedback",
+    //   href: routes.helpFeedback,
+    // },
+    {
+      label: "Categories",
+      href: routes.categories,
     },
     {
-      label: "Dashboard",
-      href: "/dashboard",
+      label: "Menu Items",
+      href: routes.menuItems,
     },
     {
-      label: "Projects",
-      href: "/projects",
-    },
-    {
-      label: "Team",
-      href: "/team",
-    },
-    {
-      label: "Calendar",
-      href: "/calendar",
-    },
-    {
-      label: "Settings",
-      href: "/settings",
-    },
-    {
-      label: "Help & Feedback",
-      href: "/help-feedback",
+      label: "Favorites",
+      href: routes.favorites,
+      protected: true,
     },
     {
       label: "Logout",
-      href: "/logout",
+      href: "#",
+      protected: true,
     },
   ],
   links: {
-    github: "https://github.com/eeemmm29/restaurant-menu-management",
+    github: "https://github.com/eeemmm29/MenuFrontend",
     twitter: "https://twitter.com/hero_ui",
     docs: "https://heroui.com",
     discord: "https://discord.gg/9b6yyZKmH4",

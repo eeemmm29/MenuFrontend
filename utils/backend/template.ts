@@ -4,19 +4,9 @@ const fetchBackend = async (
   url: string,
   method: "get" | "post" | "put" | "delete",
   data?: any,
-  allowUnAuth: boolean = false,
+  token?: string,
   contentType: string = "application/json"
 ): Promise<any> => {
-  // Get CSRF token from cookie if it exists
-  const getCookie = (name: string): string | null => {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop()?.split(";").shift() || null;
-    return null;
-  };
-
-  const csrfToken = getCookie("csrftoken");
-
   const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
   if (!apiUrl) {
     throw new Error("Backend URL is not defined in the .env file");
@@ -24,10 +14,13 @@ const fetchBackend = async (
 
   try {
     const fullUrl = `${apiUrl}${url}`;
-    const headers: Record<string, string> = {
-      "X-CSRFToken": csrfToken || "",
+    const headers: HeadersInit = {
       "Content-Type": contentType,
     };
+
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
 
     if (method === "get") {
       const response = await axios[method](fullUrl, { headers });

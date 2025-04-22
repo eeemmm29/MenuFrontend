@@ -1,32 +1,36 @@
+"use client";
+
+import { GithubIcon } from "@/components/icons";
+import { ThemeSwitch } from "@/components/theme-switch";
+import { routes } from "@/config/routes";
+import { siteConfig } from "@/config/site";
+import { Avatar } from "@heroui/avatar";
+import { Button } from "@heroui/button";
+import { Chip } from "@heroui/chip";
+import {
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+} from "@heroui/dropdown";
+import { Link } from "@heroui/link";
 import {
   Navbar as HeroUINavbar,
-  NavbarContent,
-  NavbarMenu,
-  NavbarMenuToggle,
   NavbarBrand,
+  NavbarContent,
   NavbarItem,
+  NavbarMenu,
   NavbarMenuItem,
+  NavbarMenuToggle,
 } from "@heroui/navbar";
-import { Button } from "@heroui/button";
-import { Kbd } from "@heroui/kbd";
-import { Link } from "@heroui/link";
-import { Input } from "@heroui/input";
 import { link as linkStyles } from "@heroui/theme";
-import NextLink from "next/link";
 import clsx from "clsx";
-
-import { siteConfig } from "@/config/site";
-import { ThemeSwitch } from "@/components/theme-switch";
-import {
-  TwitterIcon,
-  GithubIcon,
-  DiscordIcon,
-  HeartFilledIcon,
-  SearchIcon,
-  Logo,
-} from "@/components/icons";
+import { signOut, useSession } from "next-auth/react";
+import NextLink from "next/link";
 
 export const Navbar = () => {
+  const { data: session, status } = useSession();
+
   // const searchInput = (
   //   <Input
   //     aria-label="Search"
@@ -49,10 +53,13 @@ export const Navbar = () => {
   // );
 
   return (
-    <HeroUINavbar maxWidth="xl" position="sticky">
+    <HeroUINavbar maxWidth="xl">
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
-        <NavbarBrand as="li" className="gap-3 max-w-fit">
-          <NextLink className="flex justify-start items-center gap-1" href="/">
+        <NavbarBrand className="gap-3 max-w-fit">
+          <NextLink
+            className="flex justify-start items-center gap-1"
+            href={routes.home}
+          >
             {/* <Logo /> */}
             <p className="font-bold text-inherit">RMMS</p>
           </NextLink>
@@ -80,6 +87,67 @@ export const Navbar = () => {
         justify="end"
       >
         <NavbarItem className="hidden sm:flex gap-2">
+          {status != "loading" &&
+            (status === "authenticated" ? (
+              <Dropdown placement="bottom-end">
+                <DropdownTrigger>
+                  <Avatar
+                    isBordered
+                    as="button"
+                    className="transition-transform"
+                    color="secondary"
+                    name={
+                      session.user?.username || session.user?.email || "User"
+                    }
+                    size="sm"
+                    src={session.user?.image || undefined} // Use user image if available
+                  />
+                </DropdownTrigger>
+                <DropdownMenu aria-label="Profile Actions" variant="flat">
+                  <DropdownItem
+                    key="profile"
+                    className="h-14"
+                    description={
+                      session.user?.isAdmin && (
+                        <Chip size="sm" color="success" className="mt-1">
+                          Admin
+                        </Chip>
+                      )
+                    }
+                  >
+                    {`Signed in as ${session.user?.username || session.user?.email}`}
+                  </DropdownItem>
+                  <DropdownItem
+                    key="settings"
+                    as={NextLink}
+                    href={routes.profile}
+                  >
+                    My Profile
+                  </DropdownItem>
+                  <DropdownItem
+                    key="logout"
+                    color="danger"
+                    onPress={() => signOut()}
+                  >
+                    Logout
+                  </DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
+            ) : (
+              <>
+                <Button as={NextLink} href={routes.auth.login} variant="flat">
+                  Login
+                </Button>
+                <Button
+                  as={NextLink}
+                  color="primary"
+                  href={routes.auth.signup}
+                  variant="flat"
+                >
+                  Sign Up
+                </Button>
+              </>
+            ))}
           {/* <Link isExternal aria-label="Twitter" href={siteConfig.links.twitter}>
             <TwitterIcon className="text-default-500" />
           </Link>
@@ -117,23 +185,31 @@ export const Navbar = () => {
       <NavbarMenu>
         {/* {searchInput} */}
         <div className="mx-4 mt-2 flex flex-col gap-2">
-          {siteConfig.navMenuItems.map((item, index) => (
-            <NavbarMenuItem key={`${item}-${index}`}>
-              <Link
-                color={
-                  index === 2
-                    ? "primary"
-                    : index === siteConfig.navMenuItems.length - 1
+          {siteConfig.navMenuItems.map((item, index) => {
+            if (item.protected && status !== "authenticated") {
+              return null;
+            }
+            return (
+              <NavbarMenuItem key={`${item}-${index}`}>
+                <Link
+                  color={
+                    index === siteConfig.navMenuItems.length - 1
                       ? "danger"
                       : "foreground"
-                }
-                href="#"
-                size="lg"
-              >
-                {item.label}
-              </Link>
-            </NavbarMenuItem>
-          ))}
+                  }
+                  onPress={
+                    index === siteConfig.navMenuItems.length - 1
+                      ? () => signOut()
+                      : undefined
+                  }
+                  href={item.href}
+                  size="lg"
+                >
+                  {item.label}
+                </Link>
+              </NavbarMenuItem>
+            );
+          })}
         </div>
       </NavbarMenu>
     </HeroUINavbar>

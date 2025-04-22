@@ -29,6 +29,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             refresh: res.data.refresh,
             accessExpiration: res.data.accessExpiration,
             refreshExpiration: res.data.refreshExpiration,
+            isAdmin: res.data.user.isAdmin,
           };
         }
         return null;
@@ -40,7 +41,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   callbacks: {
     jwt: async ({ token, user }) => {
-      // If this is a login, attach the tokens.
+      // If this is a login, attach the tokens and user info.
       if (user) {
         token.access = user.access;
         token.refresh = user.refresh;
@@ -58,7 +59,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return await refreshAccessToken(token);
     },
     session: async ({ session, token }) => {
-      session.user = token.user;
+      // Pass user info from token to session
+      if (token.user) {
+        session.user = token.user;
+      }
       session.access = token.access;
       session.refresh = token.refresh;
       return session;

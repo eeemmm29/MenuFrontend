@@ -1,12 +1,11 @@
-import { Link } from "@heroui/link";
-import { Snippet } from "@heroui/snippet";
-import { Code } from "@heroui/code";
-import { button as buttonStyles } from "@heroui/theme";
-import { siteConfig } from "@/config/site";
-import { title, subtitle } from "@/components/primitives";
 import { GithubIcon } from "@/components/icons";
-import clsx from "clsx";
+import { subtitle, title } from "@/components/primitives";
+import { routes } from "@/config/routes"; // Import routes
+import { siteConfig } from "@/config/site";
 import { Button } from "@heroui/button";
+import { Link } from "@heroui/link";
+import { button as buttonStyles } from "@heroui/theme";
+import clsx from "clsx";
 
 export default function Home() {
   return (
@@ -27,7 +26,7 @@ export default function Home() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <Button
           as={Link}
-          href="/categories"
+          href={routes.categories}
           color="primary"
           variant="shadow"
           className={clsx(
@@ -48,7 +47,7 @@ export default function Home() {
 
         <Button
           as={Link}
-          href="/menu-items"
+          href={routes.menuItems}
           className={clsx(
             buttonStyles({ color: "primary", variant: "shadow" }),
             "flex flex-col gap-1.5 min-h-48"
