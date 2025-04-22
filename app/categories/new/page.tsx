@@ -1,29 +1,18 @@
 "use client";
 
+import CategoryForm, { CategoryFormData } from "@/components/CategoryForm";
 import { routes } from "@/config/routes";
-import { Category } from "@/types/backend/categories";
 import { createCategory } from "@/utils/backend/categories";
-import { Button } from "@heroui/button";
-import { Form } from "@heroui/form";
-import { Input } from "@heroui/input";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form"; // Import useForm
-
-type CategoryFormData = Omit<Category, "id">;
+import { SubmitHandler } from "react-hook-form";
 
 export default function NewCategoryPage() {
   const { data: session } = useSession();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<CategoryFormData>();
 
   const onSubmit: SubmitHandler<CategoryFormData> = async (data) => {
     const token = session?.access;
@@ -34,7 +23,7 @@ export default function NewCategoryPage() {
     setIsLoading(true);
     setError(null);
     try {
-      await createCategory(data, token); // Use data from react-hook-form
+      await createCategory(data, token);
       router.push(routes.categories); // Redirect to categories list on success
     } catch (err: any) {
       console.error("Failed to create category:", err);
@@ -47,31 +36,13 @@ export default function NewCategoryPage() {
   return (
     <>
       <h1 className="text-3xl font-bold mb-6">Create New Category</h1>
-      <Form onSubmit={handleSubmit(onSubmit)} className="space-y-4 max-w-lg">
-        <Input
-          label="Category Name"
-          placeholder="Enter category name"
-          {...register("name", { required: "Category name is required" })}
-          isRequired
-          isDisabled={isLoading}
-          isInvalid={!!errors.name}
-          errorMessage={errors.name?.message}
-        />
-        {error && <p className="text-red-500 text-sm">{error}</p>}
-        <div className="flex gap-2 justify-end">
-          <Button
-            color="danger"
-            variant="flat"
-            onPress={() => router.back()}
-            isDisabled={isLoading}
-          >
-            Cancel
-          </Button>
-          <Button type="submit" color="primary" isLoading={isLoading}>
-            Create Category
-          </Button>
-        </div>
-      </Form>
+      <CategoryForm
+        onSubmit={onSubmit}
+        isLoading={isLoading}
+        error={error}
+        onCancel={() => router.back()}
+        submitButtonText="Create Category"
+      />
     </>
   );
 }

@@ -1,65 +1,45 @@
 "use client";
 
-import { routes } from "@/config/routes";
-import { Category } from "@/types/backend/categories";
-import { MenuItem } from "@/types/backend/menuItems";
-import { getCategories } from "@/utils/backend/categories";
-import { createMenuItem } from "@/utils/backend/menuItems";
-import { Button } from "@heroui/button";
-import { Form } from "@heroui/form";
-import { Input, Textarea } from "@heroui/input";
-import { Select, SelectItem } from "@heroui/select";
-import { useSession } from "next-auth/react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { Controller, SubmitHandler, useForm } from "react-hook-form"; // Import useForm and Controller
-
-type MenuItemFormData = Omit<MenuItem, "id">;
+import { useSession } from "next-auth/react";
+import { SubmitHandler } from "react-hook-form";
+import { createMenuItem } from "@/utils/backend/menuItems";
+import { routes } from "@/config/routes";
+import MenuItemForm, { MenuItemFormData } from "@/components/MenuItemForm";
 
 export default function NewMenuItemPage() {
   const { data: session } = useSession();
-  const [categories, setCategories] = useState<Category[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
   const router = useRouter();
 
-  // Initialize react-hook-form
-  const {
-    register,
-    handleSubmit,
-    control,
-    formState: { errors },
-  } = useForm<MenuItemFormData>();
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      setIsCategoriesLoading(true);
-      try {
-        const response = await getCategories();
-        setCategories(response.results);
-      } catch (err) {
-        console.error("Failed to fetch categories:", err);
-        setError("Could not load categories. Please try again later.");
-      } finally {
-        setIsCategoriesLoading(false);
-      }
-    };
-    fetchCategories();
-  }, []);
-
-  // Define the onSubmit handler for react-hook-form
   const onSubmit: SubmitHandler<MenuItemFormData> = async (data) => {
     const token = session?.access;
     if (!token) {
       setError("You must be logged in to create a menu item.");
       return;
     }
+
     setIsLoading(true);
     setError(null);
+
+    // Convert price to number if it's a string (should be handled by react-hook-form valueAsNumber)
+    const priceAsNumber =
+      typeof data.price === "string" ? parseFloat(data.price) : data.price;
+
+    // Prepare payload, ensuring category is a number
+    const payload: Omit<MenuItem, "id" | "image"> = {
+      ...data,
+      price: priceAsNumber,
+      category: Number(data.category),
+    };
+
+    // TODO: Handle image upload separately if needed
+
     try {
-      await createMenuItem(data, token);
-      router.push(routes.menuItems); // Redirect to menu items list on success
+      await createMenuItem(payload, token);
+      router.push(routes.menuItems); // Redirect on success
     } catch (err: any) {
       console.error("Failed to create menu item:", err);
       setError(err.message || "An unexpected error occurred.");
@@ -71,90 +51,14 @@ export default function NewMenuItemPage() {
   return (
     <>
       <h1 className="text-3xl font-bold mb-6">Create New Menu Item</h1>
-      <Form onSubmit={handleSubmit(onSubmit)} className="space-y-4 max-w-lg">
-        <Input
-          label="Item Name"
-          placeholder="Enter item name"
-          // Register the input
-          {...register("name", { required: "Item name is required" })}
-          isRequired
-          isDisabled={isLoading}
-          isInvalid={!!errors.name}
-          errorMessage={errors.name?.message}
-        />
-        <Textarea
-          label="Description"
-          placeholder="Enter item description"
-          // Register the textarea
-          {...register("description", { required: "Description is required" })}
-          isRequired
-          isDisabled={isLoading}
-          isInvalid={!!errors.description}
-          errorMessage={errors.description?.message}
-        />
-        <Input
-          label="Price"
-          placeholder="Enter price (e.g., 9.99)"
-          type="number"
-          step="0.01"
-          min="0"
-          // Register the input, converting value to number
-          {...register("price", {
-            required: "Price is required",
-            valueAsNumber: true, // Ensure value is treated as a number
-            min: { value: 0, message: "Price must be non-negative" },
-          })}
-          isRequired
-          isDisabled={isLoading}
-          isInvalid={!!errors.price}
-          errorMessage={errors.price?.message}
-        />
-        {/* Use Controller for the Select component */}
-        <Controller
-          name="category"
-          control={control}
-          rules={{ required: "Category is required" }}
-          render={({ field }) => (
-            <Select
-              label="Category"
-              placeholder="Select a category"
-              selectedKeys={field.value ? [String(field.value)] : []}
-              // Update field value on change, converting to number
-              onSelectionChange={(keys) => {
-                const selectedKey = Array.from(keys)[0];
-                field.onChange(selectedKey ? Number(selectedKey) : undefined);
-              }}
-              isRequired
-              isDisabled={isLoading || isCategoriesLoading}
-              isLoading={isCategoriesLoading}
-              isInvalid={!!errors.category}
-              errorMessage={errors.category?.message}
-            >
-              {categories.map((cat) => (
-                <SelectItem key={cat.id}>{cat.name}</SelectItem>
-              ))}
-            </Select>
-          )}
-        />
-
-        {/* Add Image Upload Field later if needed */}
-
-        {/* Display API errors */}
-        {error && <p className="text-red-500 text-sm">{error}</p>}
-        <div className="flex gap-2 justify-end">
-          <Button
-            color="danger"
-            variant="flat"
-            onPress={() => router.back()}
-            isDisabled={isLoading}
-          >
-            Cancel
-          </Button>
-          <Button type="submit" color="primary" isLoading={isLoading}>
-            Create Menu Item
-          </Button>
-        </div>
-      </Form>
+      <MenuItemForm
+        onSubmit={onSubmit}
+        isLoading={isLoading}
+        error={error}
+        onCancel={() => router.back()}
+        submitButtonText="Create Item"
+        // No initialData or currentImageUrl for create form
+      />
     </>
   );
 }

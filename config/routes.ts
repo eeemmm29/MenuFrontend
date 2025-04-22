@@ -15,4 +15,11 @@ export const routes = {
     login: "/auth/login",
     signup: "/auth/signup",
   },
+  newCategory: "/categories/new",
+  categoryDetail: (id: number | string) => `/categories/${id}`, // Add category detail route
+  editCategory: (id: number | string) => `/categories/${id}/edit`, // Add category edit route
+  // Menu Items
+  newMenuItem: "/menu-items/new",
+  menuItemDetail: (id: number | string) => `/menu-items/${id}`,
+  editMenuItem: (id: number | string) => `/menu-items/${id}/edit`,
 };

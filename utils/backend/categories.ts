@@ -7,6 +7,12 @@ export const getCategories = async (): Promise<PaginatedResponse<Category>> => {
   return data;
 };
 
+// Add function to get a single category by ID
+export const getCategoryById = async (id: number): Promise<Category> => {
+  const data = await fetchBackend(`/api/categories/${id}/`, "get");
+  return data;
+};
+
 export const createCategory = async (
   category: Omit<Category, "id">,
   token: string
@@ -17,13 +23,27 @@ export const createCategory = async (
 
 export const updateCategory = async (
   id: number,
-  category: Partial<Omit<Category, "id">>
+  category: Partial<Omit<Category, "id">>,
+  token: string // Add token parameter
 ) => {
-  const data = await fetchBackend(`/api/categories/${id}/`, "put", category);
+  // Pass token to fetchBackend
+  const data = await fetchBackend(
+    `/api/categories/${id}/`,
+    "put",
+    category,
+    token
+  );
   return data;
 };
 
-export const deleteCategory = async (id: number) => {
-  const data = await fetchBackend(`/api/categories/${id}/`, "delete");
+export const deleteCategory = async (id: number, token: string) => {
+  // Add token parameter
+  // Pass token to fetchBackend
+  const data = await fetchBackend(
+    `/api/categories/${id}/`,
+    "delete",
+    undefined,
+    token
+  );
   return data;
 };
