@@ -4,6 +4,7 @@ import { deleteCategory, getCategoryById } from "@/utils/backend/categories";
 import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import MenuItemsList from "../menu-items/list";
 import { ResourceDetailCard } from "../resources/ResourceDetailCard";
 
 export default function CategoryDetail() {
@@ -72,14 +73,17 @@ export default function CategoryDetail() {
   const categoryDetails = [{ label: "Name", value: category.name }]; // Add more details if they exist
 
   return (
-    <ResourceDetailCard
-      title="Category Details"
-      details={categoryDetails}
-      editUrl={routes.editCategory(categoryId)}
-      onDelete={handleDelete}
-      isDeleting={isDeleting}
-      canEditDelete={!!session?.user?.isAdmin}
-      deleteError={deleteError}
-    />
+    <>
+      <ResourceDetailCard
+        title="Category Details"
+        details={categoryDetails}
+        editUrl={routes.editCategory(categoryId)}
+        onDelete={handleDelete}
+        isDeleting={isDeleting}
+        canEditDelete={!!session?.user?.isAdmin}
+        deleteError={deleteError}
+      />
+      <MenuItemsList categoryId={categoryId} />
+    </>
   );
 }

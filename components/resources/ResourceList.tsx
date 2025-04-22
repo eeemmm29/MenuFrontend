@@ -49,13 +49,15 @@ export default function ResourceList<T extends ResourceItem>({
     <>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">{title}</h1>
-        <Button color="primary" as={Link} href={newItemPath}>
-          Add New{" "}
-          {title
-            .replace("Menu ", "")
-            .replace("Items", "Item")
-            .replace("Categories", "Category")}
-        </Button>
+        {session?.user?.isAdmin && (
+          <Button color="primary" as={Link} href={newItemPath}>
+            Add New{" "}
+            {title
+              .replace("Menu ", "")
+              .replace("Items", "Item")
+              .replace("Categories", "Category")}
+          </Button>
+        )}
       </div>
 
       {items.length === 0 && <p>No {title.toLowerCase()} found.</p>}

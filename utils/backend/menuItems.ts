@@ -2,10 +2,13 @@ import { MenuItem } from "@/types/backend/menuItems";
 import fetchBackend from "./template";
 import { PaginatedResponse } from "@/types/backend/responses";
 
-export const getMenuItems = async (): Promise<PaginatedResponse<MenuItem>> => {
-  const data = await fetchBackend("/api/menu-items/", "get");
-  console.log("Menu items data:", data);
-  console.log(typeof data.results[0].price);
+export const getMenuItems = async (
+  categoryId?: number
+): Promise<PaginatedResponse<MenuItem>> => {
+  const url = categoryId
+    ? `/api/menu-items/?category=${categoryId}`
+    : "/api/menu-items/";
+  const data = await fetchBackend(url, "get");
   return data;
 };
 

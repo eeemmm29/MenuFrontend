@@ -32,11 +32,12 @@ const renderMenuItemCardBody = (item: MenuItem) => (
   </>
 );
 
-export default function MenuItemsList() {
+export default function MenuItemsList({ categoryId }: { categoryId?: number }) {
+  const title = categoryId ? "Menu Items in this Category" : "Menu Items";
   return (
     <ResourceList<MenuItem>
-      title="Menu Items"
-      fetchFunction={getMenuItems}
+      title={title}
+      fetchFunction={() => getMenuItems(categoryId)}
       newItemPath={routes.newMenuItem}
       renderItemCardBody={renderMenuItemCardBody}
       itemBasePath={routes.menuItems}
