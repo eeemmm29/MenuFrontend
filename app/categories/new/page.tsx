@@ -45,22 +45,18 @@ export default function NewCategoryPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <>
       <h1 className="text-3xl font-bold mb-6">Create New Category</h1>
-      {/* Use react-hook-form's handleSubmit */}
       <Form onSubmit={handleSubmit(onSubmit)} className="space-y-4 max-w-lg">
         <Input
           label="Category Name"
           placeholder="Enter category name"
-          // Register the input with react-hook-form
           {...register("name", { required: "Category name is required" })}
           isRequired
           isDisabled={isLoading}
-          // Display validation errors
           isInvalid={!!errors.name}
           errorMessage={errors.name?.message}
         />
-        {/* Display API errors */}
         {error && <p className="text-red-500 text-sm">{error}</p>}
         <div className="flex gap-2 justify-end">
           <Button
@@ -76,6 +72,6 @@ export default function NewCategoryPage() {
           </Button>
         </div>
       </Form>
-    </div>
+    </>
   );
 }

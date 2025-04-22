@@ -69,9 +69,8 @@ export default function NewMenuItemPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <>
       <h1 className="text-3xl font-bold mb-6">Create New Menu Item</h1>
-      {/* Use react-hook-form's handleSubmit */}
       <Form onSubmit={handleSubmit(onSubmit)} className="space-y-4 max-w-lg">
         <Input
           label="Item Name"
@@ -156,6 +155,6 @@ export default function NewMenuItemPage() {
           </Button>
         </div>
       </Form>
-    </div>
+    </>
   );
 }

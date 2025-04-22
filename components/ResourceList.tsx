@@ -55,7 +55,7 @@ export default function ResourceList<T extends ResourceItem>({
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">{title}</h1>
         <Button color="primary" onPress={() => router.push(newItemPath)}>
@@ -93,6 +93,6 @@ export default function ResourceList<T extends ResourceItem>({
           </Card>
         ))}
       </div>
-    </div>
+    </>
   );
 }
