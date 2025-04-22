@@ -34,6 +34,10 @@ export const siteConfig = {
       label: "Menu Items",
       href: routes.menuItems,
     },
+    {
+      label: "Favorites",
+      href: routes.favorites,
+    },
   ],
   navMenuItems: [
     {

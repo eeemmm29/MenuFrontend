@@ -11,6 +11,7 @@ export const routes = {
   logout: "/logout",
   categories: "/categories",
   menuItems: "/menu-items",
+  favorites: "/favorites", // Add favorites route
   auth: {
     login: "/auth/login",
     signup: "/auth/signup",
