@@ -67,7 +67,7 @@ export default function ResourceList<T extends ResourceItem>({
           <Card key={item.id} shadow="sm">
             {/* RenderItemCardBody is responsible for CardHeader and CardBody content */}
             {renderItemCardBody(item)}
-            <CardFooter className="justify-start space-x-2">
+            <CardFooter className="justify-end space-x-2">
               {session?.user?.isAdmin && (
                 <Button
                   size="sm"
