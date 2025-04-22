@@ -81,7 +81,6 @@ export default function CategoryDetailPage() {
       onDelete={handleDelete}
       isDeleting={isDeleting}
       canEditDelete={!!session?.user?.isAdmin}
-      onBack={() => router.back()}
       deleteError={deleteError}
     />
   );

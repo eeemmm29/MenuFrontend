@@ -13,7 +13,6 @@ interface ResourceDetailCardProps {
   onDelete: () => Promise<void>;
   isDeleting: boolean;
   canEditDelete: boolean;
-  onBack: () => void;
   deleteError?: string | null;
 }
 
@@ -25,7 +24,6 @@ export const ResourceDetailCard: React.FC<ResourceDetailCardProps> = ({
   onDelete,
   isDeleting,
   canEditDelete,
-  onBack,
   deleteError,
 }) => {
   // Find the "Name" detail item
@@ -69,9 +67,6 @@ export const ResourceDetailCard: React.FC<ResourceDetailCardProps> = ({
               </Button>
             </>
           )}
-          <Button variant="flat" onPress={onBack}>
-            Back
-          </Button>
         </CardFooter>
       </Card>
       {/* Display delete errors */}

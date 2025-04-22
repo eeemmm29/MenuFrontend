@@ -108,7 +108,6 @@ export default function MenuItemDetailPage() {
       onDelete={handleDelete}
       isDeleting={isDeleting}
       canEditDelete={!!session?.user?.isAdmin}
-      onBack={() => router.back()}
       deleteError={deleteError}
     />
   );
