@@ -44,29 +44,41 @@ export const siteConfig = {
       label: "Profile",
       href: routes.profile,
     },
+    // {
+    //   label: "Dashboard",
+    //   href: routes.dashboard,
+    // },
+    // {
+    //   label: "Projects",
+    //   href: routes.projects,
+    // },
+    // {
+    //   label: "Team",
+    //   href: routes.team,
+    // },
+    // {
+    //   label: "Calendar",
+    //   href: routes.calendar,
+    // },
+    // {
+    //   label: "Settings",
+    //   href: routes.settings,
+    // },
+    // {
+    //   label: "Help & Feedback",
+    //   href: routes.helpFeedback,
+    // },
     {
-      label: "Dashboard",
-      href: routes.dashboard,
+      label: "Categories",
+      href: routes.categories,
     },
     {
-      label: "Projects",
-      href: routes.projects,
+      label: "Menu Items",
+      href: routes.menuItems,
     },
     {
-      label: "Team",
-      href: routes.team,
-    },
-    {
-      label: "Calendar",
-      href: routes.calendar,
-    },
-    {
-      label: "Settings",
-      href: routes.settings,
-    },
-    {
-      label: "Help & Feedback",
-      href: routes.helpFeedback,
+      label: "Favorites",
+      href: routes.favorites,
     },
     {
       label: "Logout",

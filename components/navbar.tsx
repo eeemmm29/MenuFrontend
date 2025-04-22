@@ -30,6 +30,7 @@ import NextLink from "next/link";
 
 export const Navbar = () => {
   const { data: session, status } = useSession();
+
   // const searchInput = (
   //   <Input
   //     aria-label="Search"
@@ -52,7 +53,7 @@ export const Navbar = () => {
   // );
 
   return (
-    <HeroUINavbar maxWidth="xl" position="sticky">
+    <HeroUINavbar maxWidth="xl">
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand className="gap-3 max-w-fit">
           <NextLink
@@ -188,13 +189,11 @@ export const Navbar = () => {
             <NavbarMenuItem key={`${item}-${index}`}>
               <Link
                 color={
-                  index === 2
-                    ? "primary"
-                    : index === siteConfig.navMenuItems.length - 1
-                      ? "danger"
-                      : "foreground"
+                  index === siteConfig.navMenuItems.length - 1
+                    ? "danger"
+                    : "foreground"
                 }
-                href="#"
+                href={item.href}
                 size="lg"
               >
                 {item.label}
