@@ -9,6 +9,7 @@ import { Button } from "@heroui/button";
 import { Form } from "@heroui/form";
 import { Input, Textarea } from "@heroui/input";
 import { Select, SelectItem } from "@heroui/select";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form"; // Import useForm and Controller
@@ -16,7 +17,7 @@ import { Controller, SubmitHandler, useForm } from "react-hook-form"; // Import 
 type MenuItemFormData = Omit<MenuItem, "id">;
 
 export default function NewMenuItemPage() {
-  // Remove useState for form fields
+  const { data: session } = useSession();
   const [categories, setCategories] = useState<Category[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -27,7 +28,7 @@ export default function NewMenuItemPage() {
   const {
     register,
     handleSubmit,
-    control, // Add control for Controller
+    control,
     formState: { errors },
   } = useForm<MenuItemFormData>();
 
@@ -49,12 +50,15 @@ export default function NewMenuItemPage() {
 
   // Define the onSubmit handler for react-hook-form
   const onSubmit: SubmitHandler<MenuItemFormData> = async (data) => {
+    const token = session?.access;
+    if (!token) {
+      setError("You must be logged in to create a menu item.");
+      return;
+    }
     setIsLoading(true);
     setError(null);
-
     try {
-      // Data is already in the correct format
-      await createMenuItem(data);
+      await createMenuItem(data, token);
       router.push(routes.menuItems); // Redirect to menu items list on success
     } catch (err: any) {
       console.error("Failed to create menu item:", err);
