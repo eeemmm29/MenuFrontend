@@ -5,7 +5,7 @@ import { Category } from "@/types/backend/categories";
 import { createCategory } from "@/utils/backend/categories";
 import { Button } from "@heroui/button";
 import { Form } from "@heroui/form";
-import { Input, Textarea } from "@heroui/input";
+import { Input } from "@heroui/input";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -14,10 +14,10 @@ import { SubmitHandler, useForm } from "react-hook-form"; // Import useForm
 type CategoryFormData = Omit<Category, "id">;
 
 export default function NewCategoryPage() {
+  const { data: session } = useSession();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const { data: session } = useSession();
 
   const {
     register,
@@ -59,17 +59,6 @@ export default function NewCategoryPage() {
           // Display validation errors
           isInvalid={!!errors.name}
           errorMessage={errors.name?.message}
-        />
-        <Textarea
-          label="Description"
-          placeholder="Enter category description"
-          // Register the textarea with react-hook-form
-          {...register("description", { required: "Description is required" })}
-          isRequired
-          isDisabled={isLoading}
-          // Display validation errors
-          isInvalid={!!errors.description}
-          errorMessage={errors.description?.message}
         />
         {/* Display API errors */}
         {error && <p className="text-red-500 text-sm">{error}</p>}
