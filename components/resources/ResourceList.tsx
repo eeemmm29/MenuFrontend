@@ -1,5 +1,3 @@
-"use client";
-
 import { Button, Card, CardFooter } from "@heroui/react";
 import Link from "next/link";
 import { ReactNode, useEffect, useState } from "react";

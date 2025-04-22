@@ -1,25 +1,7 @@
 "use client";
 
-import ResourceList from "@/components/ResourceList"; // Import the new component
-import { Category } from "@/types/backend/categories";
-import { getCategories } from "@/utils/backend/categories";
-import { CardHeader } from "@heroui/react"; // Import necessary components for rendering
-
-// Define the rendering logic for a Category card body
-const renderCategoryCardBody = (category: Category) => (
-  <CardHeader className="flex-col items-start px-4 pt-4 pb-0">
-    <h2 className="text-xl font-semibold mb-2">{category.name}</h2>
-  </CardHeader>
-);
+import CategoriesList from "@/components/categories/list";
 
 export default function CategoriesPage() {
-  return (
-    <ResourceList<Category>
-      title="Menu Categories"
-      fetchFunction={getCategories}
-      newItemPath="/categories/new"
-      renderItemCardBody={renderCategoryCardBody}
-      itemBasePath="/categories"
-    />
-  );
+  return <CategoriesList />;
 }

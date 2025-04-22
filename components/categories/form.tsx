@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Button, Input, Form } from "@heroui/react";
