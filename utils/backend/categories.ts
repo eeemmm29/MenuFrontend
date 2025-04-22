@@ -7,8 +7,11 @@ export const getCategories = async (): Promise<PaginatedResponse<Category>> => {
   return data;
 };
 
-export const createCategory = async (category: Omit<Category, "id">) => {
-  const data = await fetchBackend("/api/categories/", "post", category);
+export const createCategory = async (
+  category: Omit<Category, "id">,
+  token: string
+) => {
+  const data = await fetchBackend("/api/categories/", "post", category, token);
   return data;
 };
 

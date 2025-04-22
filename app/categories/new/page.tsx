@@ -6,6 +6,7 @@ import { createCategory } from "@/utils/backend/categories";
 import { Button } from "@heroui/button";
 import { Form } from "@heroui/form";
 import { Input, Textarea } from "@heroui/input";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form"; // Import useForm
@@ -16,6 +17,7 @@ export default function NewCategoryPage() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { data: session } = useSession();
 
   const {
     register,
@@ -24,11 +26,15 @@ export default function NewCategoryPage() {
   } = useForm<CategoryFormData>();
 
   const onSubmit: SubmitHandler<CategoryFormData> = async (data) => {
+    const token = session?.access;
+    if (!token) {
+      setError("You must be logged in to create a category.");
+      return;
+    }
     setIsLoading(true);
     setError(null);
-
     try {
-      await createCategory(data); // Use data from react-hook-form
+      await createCategory(data, token); // Use data from react-hook-form
       router.push(routes.categories); // Redirect to categories list on success
     } catch (err: any) {
       console.error("Failed to create category:", err);
