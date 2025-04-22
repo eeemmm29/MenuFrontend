@@ -1,12 +1,18 @@
+import { routes } from "@/config/routes";
 import { MenuItem } from "@/types/backend/menuItems";
 import { getMenuItems } from "@/utils/backend/menuItems";
 import { CardBody, CardHeader, Image } from "@heroui/react";
+import Link from "next/link";
 import ResourceList from "../resources/ResourceList";
 
 // Define the rendering logic for a MenuItem card body
 const renderMenuItemCardBody = (item: MenuItem) => (
   <>
-    <CardHeader className="flex-col items-start px-4 pt-4 pb-0">
+    <CardHeader
+      as={Link}
+      href={`${routes.menuItems}/${item.id}`}
+      className="flex-col items-start px-4 pt-4 pb-0"
+    >
       {item.image && (
         <Image
           removeWrapper
@@ -31,9 +37,9 @@ export default function MenuItemsList() {
     <ResourceList<MenuItem>
       title="Menu Items"
       fetchFunction={getMenuItems}
-      newItemPath="/menu-items/new"
+      newItemPath={routes.newMenuItem}
       renderItemCardBody={renderMenuItemCardBody}
-      itemBasePath="/menu-items"
+      itemBasePath={routes.menuItems}
     />
   );
 }
