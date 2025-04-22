@@ -1,7 +1,9 @@
-import { useEffect } from "react";
-import { useForm, SubmitHandler } from "react-hook-form";
-import { Button, Input, Form } from "@heroui/react";
 import { Category } from "@/types/backend/categories";
+import { Button } from "@heroui/button";
+import { Form } from "@heroui/form";
+import { Input, Textarea } from "@heroui/input";
+import { useEffect } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
 
 export type CategoryFormData = Omit<Category, "id">;
 
@@ -45,6 +47,17 @@ export default function CategoryForm({
         isDisabled={isLoading}
         isInvalid={!!errors.name}
         errorMessage={errors.name?.message}
+      />
+      <Textarea
+        label="Description"
+        placeholder="Enter category description"
+        // Register the textarea with react-hook-form
+        {...register("description", { required: "Description is required" })}
+        isRequired
+        isDisabled={isLoading}
+        // Display validation errors
+        isInvalid={!!errors.description}
+        errorMessage={errors.description?.message}
       />
       {error && <p className="text-red-500 text-sm">{error}</p>}
       <div className="flex gap-2 justify-end">
