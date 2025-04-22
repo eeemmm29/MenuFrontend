@@ -1,4 +1,5 @@
 import { Button, Card, CardFooter } from "@heroui/react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { ReactNode, useEffect, useState } from "react";
 
@@ -27,6 +28,7 @@ export default function ResourceList<T extends ResourceItem>({
   renderItemCardBody,
   itemBasePath,
 }: ResourceListProps<T>) {
+  const { data: session } = useSession();
   const [items, setItems] = useState<T[]>([]);
 
   useEffect(() => {
@@ -64,14 +66,16 @@ export default function ResourceList<T extends ResourceItem>({
             {/* RenderItemCardBody is responsible for CardHeader and CardBody content */}
             {renderItemCardBody(item)}
             <CardFooter className="justify-start space-x-2">
-              <Button
-                size="sm"
-                variant="ghost"
-                as={Link}
-                href={`${itemBasePath}/${item.id}/edit`}
-              >
-                Edit
-              </Button>
+              {session?.user?.isAdmin && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  as={Link}
+                  href={`${itemBasePath}/${item.id}/edit`}
+                >
+                  Edit
+                </Button>
+              )}
               <Button
                 size="sm"
                 variant="ghost"
