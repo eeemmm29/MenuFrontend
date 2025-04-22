@@ -3,6 +3,7 @@ import { Form } from "@heroui/form";
 import { Input } from "@heroui/input";
 import axios from "axios";
 import { signIn } from "next-auth/react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 export default function SignUp() {
@@ -11,6 +12,7 @@ export default function SignUp() {
     handleSubmit,
     formState: { errors },
   } = useForm();
+  const [authError, setAuthError] = useState<string>();
 
   const onSubmit = async (data: any) => {
     try {
@@ -18,6 +20,8 @@ export default function SignUp() {
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/register/`,
         data
       );
+
+      setAuthError(undefined); // Clear error on success
 
       // Automatically sign in the user after successful registration
       await signIn("credentials", {
@@ -27,6 +31,7 @@ export default function SignUp() {
       });
     } catch (err: any) {
       console.error(err.response?.data || {});
+      setAuthError("Registration failed. Please try again.");
     }
   };
 
@@ -71,6 +76,7 @@ export default function SignUp() {
             required: "Confirm Password is required",
           })}
         />
+        {authError && <p style={{ color: "red" }}>{authError}</p>}
         <Button type="submit" variant="bordered">
           Sign up
         </Button>

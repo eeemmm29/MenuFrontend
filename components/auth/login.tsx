@@ -2,6 +2,7 @@ import { Button } from "@heroui/button";
 import { Form } from "@heroui/form";
 import { Input } from "@heroui/input";
 import { signIn } from "next-auth/react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 export default function Login() {
@@ -10,6 +11,7 @@ export default function Login() {
     handleSubmit,
     formState: { errors },
   } = useForm();
+  const [authError, setAuthError] = useState<string>();
 
   const onSubmit = async (data: any) => {
     const result = await signIn("credentials", {
@@ -20,7 +22,10 @@ export default function Login() {
 
     if (result?.error) {
       console.error("Authentication error:", result.error);
+      setAuthError("Invalid username or password. Please try again.");
     } else {
+      // Clear error on success and redirect
+      setAuthError(undefined);
       window.location.href = "/";
     }
   };
@@ -55,6 +60,7 @@ export default function Login() {
         {errors.password && (
           <p style={{ color: "red" }}>{errors.password.message?.toString()}</p>
         )}
+        {authError && <p style={{ color: "red" }}>{authError}</p>}
         <Button type="submit" variant="bordered">
           Sign In
         </Button>
