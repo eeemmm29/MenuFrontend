@@ -23,7 +23,6 @@ import {
   NavbarMenuItem,
   NavbarMenuToggle,
 } from "@heroui/navbar";
-import { Spacer } from "@heroui/spacer";
 import { link as linkStyles } from "@heroui/theme";
 import clsx from "clsx";
 import { signOut, useSession } from "next-auth/react";

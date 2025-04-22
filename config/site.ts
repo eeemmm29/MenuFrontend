@@ -26,6 +26,14 @@ export const siteConfig = {
       label: "About",
       href: routes.about,
     },
+    {
+      label: "Categories",
+      href: routes.categories,
+    },
+    {
+      label: "Menu Items",
+      href: routes.menuItems,
+    },
   ],
   navMenuItems: [
     {
