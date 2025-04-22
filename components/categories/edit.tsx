@@ -25,7 +25,7 @@ export default function EditCategory() {
       setIsFetching(true);
       getCategoryById(categoryId)
         .then((data) => {
-          setInitialData({ name: data.name }); // Set initial data for the form
+          setInitialData({ name: data.name, description: data.description }); // Set initial data for the form
           setError(null);
         })
         .catch((err) => {

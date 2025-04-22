@@ -1,8 +1,8 @@
 // app/components/UserProfile.tsx
 "use client";
 
-import { useSession, signIn, signOut } from "next-auth/react";
-import Protected from "@/components/Protected";
+import Protected from "@/components/auth/protected";
+import { signIn, signOut, useSession } from "next-auth/react";
 
 export default function UserProfile() {
   const { data: session, status } = useSession();
