@@ -7,6 +7,7 @@ import { SubmitHandler } from "react-hook-form";
 import { createMenuItem } from "@/utils/backend/menuItems";
 import { routes } from "@/config/routes";
 import MenuItemForm, { MenuItemFormData } from "@/components/MenuItemForm";
+import Protected from "@/components/Protected";
 
 export default function NewMenuItemPage() {
   const { data: session } = useSession();
@@ -49,7 +50,7 @@ export default function NewMenuItemPage() {
   };
 
   return (
-    <>
+    <Protected forAdmin>
       <h1 className="text-3xl font-bold mb-6">Create New Menu Item</h1>
       <MenuItemForm
         onSubmit={onSubmit}
@@ -59,6 +60,6 @@ export default function NewMenuItemPage() {
         submitButtonText="Create Item"
         // No initialData or currentImageUrl for create form
       />
-    </>
+    </Protected>
   );
 }

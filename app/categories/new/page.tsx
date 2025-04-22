@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { SubmitHandler } from "react-hook-form";
+import Protected from "@/components/Protected";
 
 export default function NewCategoryPage() {
   const { data: session } = useSession();
@@ -34,7 +35,7 @@ export default function NewCategoryPage() {
   };
 
   return (
-    <>
+    <Protected forAdmin>
       <h1 className="text-3xl font-bold mb-6">Create New Category</h1>
       <CategoryForm
         onSubmit={onSubmit}
@@ -43,6 +44,6 @@ export default function NewCategoryPage() {
         onCancel={() => router.back()}
         submitButtonText="Create Category"
       />
-    </>
+    </Protected>
   );
 }

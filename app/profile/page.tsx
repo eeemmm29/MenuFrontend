@@ -2,6 +2,7 @@
 "use client";
 
 import { useSession, signIn, signOut } from "next-auth/react";
+import Protected from "@/components/Protected";
 
 export default function UserProfile() {
   const { data: session, status } = useSession();
@@ -15,9 +16,11 @@ export default function UserProfile() {
   }
 
   return (
-    <div>
-      <p>Signed in as {session?.user?.username}</p>
-      <button onClick={() => signOut()}>Sign out</button>
-    </div>
+    <Protected>
+      <div>
+        <p>Signed in as {session?.user?.username}</p>
+        <button onClick={() => signOut()}>Sign out</button>
+      </div>
+    </Protected>
   );
 }

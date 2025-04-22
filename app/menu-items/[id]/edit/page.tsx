@@ -8,6 +8,7 @@ import { getMenuItemById, updateMenuItem } from "@/utils/backend/menuItems";
 import { MenuItem } from "@/types/backend/menuItems";
 import { routes } from "@/config/routes";
 import MenuItemForm, { MenuItemFormData } from "@/components/MenuItemForm";
+import Protected from "@/components/Protected";
 
 export default function EditMenuItemPage() {
   const { id } = useParams();
@@ -98,7 +99,7 @@ export default function EditMenuItemPage() {
   if (!session?.access) return <div>Please log in to edit this item.</div>;
 
   return (
-    <>
+    <Protected forAdmin>
       <h1 className="text-3xl font-bold mb-6">Edit Menu Item</h1>
       {initialData ? (
         <MenuItemForm
@@ -113,6 +114,6 @@ export default function EditMenuItemPage() {
       ) : (
         !error && <div>Menu item data could not be loaded.</div>
       )}
-    </>
+    </Protected>
   );
 }

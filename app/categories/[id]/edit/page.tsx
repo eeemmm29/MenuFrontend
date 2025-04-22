@@ -8,6 +8,7 @@ import { getCategoryById, updateCategory } from "@/utils/backend/categories";
 import { Category } from "@/types/backend/categories";
 import { routes } from "@/config/routes";
 import CategoryForm, { CategoryFormData } from "@/components/CategoryForm";
+import Protected from "@/components/Protected";
 
 export default function EditCategoryPage() {
   const { id } = useParams();
@@ -77,7 +78,7 @@ export default function EditCategoryPage() {
   if (!session?.access) return <div>Please log in to edit this category.</div>;
 
   return (
-    <>
+    <Protected forAdmin>
       <h1 className="text-3xl font-bold mb-6">Edit Category</h1>
       {initialData ? (
         <CategoryForm
@@ -92,6 +93,6 @@ export default function EditCategoryPage() {
         // Show error if fetching succeeded but data is still missing (shouldn't happen ideally)
         !error && <div>Category data could not be loaded.</div>
       )}
-    </>
+    </Protected>
   );
 }
