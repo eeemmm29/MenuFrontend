@@ -5,13 +5,11 @@ import {
   addFavorite,
   getFavorites,
   removeFavorite,
-} from "@/utils/backend/favorites"; // Import favorite utils
+} from "@/utils/backend/favorites";
 import { deleteMenuItem, getMenuItemById } from "@/utils/backend/menuItems";
-import { Button } from "@heroui/button"; // Import Button
 import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { HeartFilledIcon, HeartIcon } from "../icons"; // Assuming you have heart icons
 import { ResourceDetailCard } from "../resources/ResourceDetailCard";
 
 export default function MenuItemDetail() {
@@ -161,30 +159,6 @@ export default function MenuItemDetail() {
 
   return (
     <>
-      {/* Favorite Button - Show only if logged in */}
-      {status === "authenticated" && (
-        <div className="mb-4 flex items-center gap-2">
-          <Button
-            isIconOnly
-            color="danger"
-            variant={isFavorited ? "solid" : "bordered"}
-            aria-label={
-              isFavorited ? "Remove from favorites" : "Add to favorites"
-            }
-            onPress={handleToggleFavorite}
-            isLoading={isFavoriteLoading}
-          >
-            {isFavorited ? <HeartFilledIcon /> : <HeartIcon />}
-          </Button>
-          <span>
-            {isFavorited ? "Remove from Favorites" : "Add to Favorites"}
-          </span>
-        </div>
-      )}
-      {favoriteError && (
-        <p className="text-red-500 text-sm mb-4">{favoriteError}</p>
-      )}
-
       <ResourceDetailCard
         title="Menu Item Details"
         imageUrl={menuItem.image}
@@ -194,6 +168,12 @@ export default function MenuItemDetail() {
         isDeleting={isDeleting}
         canEditDelete={!!session?.user?.isAdmin}
         deleteError={deleteError}
+        // Pass favorite props down
+        showFavoriteButton={status === "authenticated"} // Only show if logged in
+        isFavorited={isFavorited}
+        isFavoriteLoading={isFavoriteLoading}
+        onToggleFavorite={handleToggleFavorite}
+        favoriteError={favoriteError}
       />
     </>
   );

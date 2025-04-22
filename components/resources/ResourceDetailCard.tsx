@@ -4,6 +4,7 @@ import { Card, CardBody, CardFooter, CardHeader } from "@heroui/card";
 import { Image } from "@heroui/image";
 import Link from "next/link";
 import React from "react";
+import { HeartFilledIcon, HeartIcon } from "../icons";
 
 interface ResourceDetailCardProps {
   title: string;
@@ -14,6 +15,12 @@ interface ResourceDetailCardProps {
   isDeleting: boolean;
   canEditDelete: boolean;
   deleteError?: string | null;
+  // Favorite props
+  showFavoriteButton?: boolean;
+  isFavorited?: boolean;
+  isFavoriteLoading?: boolean;
+  onToggleFavorite?: () => Promise<void>;
+  favoriteError?: string | null;
 }
 
 export const ResourceDetailCard: React.FC<ResourceDetailCardProps> = ({
@@ -25,6 +32,12 @@ export const ResourceDetailCard: React.FC<ResourceDetailCardProps> = ({
   isDeleting,
   canEditDelete,
   deleteError,
+  // Favorite props
+  showFavoriteButton = false,
+  isFavorited = false,
+  isFavoriteLoading = false,
+  onToggleFavorite,
+  favoriteError,
 }) => {
   // Find the "Name" detail item
   const nameDetail = details.find((item) => item.label === "Name");
@@ -33,18 +46,35 @@ export const ResourceDetailCard: React.FC<ResourceDetailCardProps> = ({
 
   return (
     <>
-      <h1 className="text-3xl font-bold mb-4">{title}</h1>
+      <h1 className="flex justify-between text-3xl font-bold mb-4">
+        {title}
+        {showFavoriteButton && onToggleFavorite && (
+          <Button
+            isIconOnly
+            color="danger"
+            variant={isFavorited ? "solid" : "bordered"}
+            aria-label={
+              isFavorited ? "Remove from favorites" : "Add to favorites"
+            }
+            onPress={onToggleFavorite}
+            isLoading={isFavoriteLoading}
+          >
+            {isFavorited ? <HeartFilledIcon /> : <HeartIcon />}
+          </Button>
+        )}
+      </h1>
       <Card className="p-6 mb-6">
         {imageUrl && (
           <Image
+            removeWrapper // Added based on usage elsewhere
             src={imageUrl}
             alt={title}
             width={200} // Adjust size as needed
             height={200}
-            className="mb-4 rounded"
+            className="mb-4 rounded object-cover" // Added object-cover
           />
         )}
-        <CardHeader className="text-2xl font-semibold">
+        <CardHeader className="text-2xl font-semibold justify-between">
           {nameDetail?.value || title}
         </CardHeader>
         <CardBody>
@@ -69,9 +99,14 @@ export const ResourceDetailCard: React.FC<ResourceDetailCardProps> = ({
           )}
         </CardFooter>
       </Card>
-      {/* Display delete errors */}
+      {/* Display errors */}
       {deleteError && (
-        <p className="text-red-500 text-sm mt-4">{deleteError}</p>
+        <p className="text-red-500 text-sm mt-4">Delete Error: {deleteError}</p>
+      )}
+      {favoriteError && (
+        <p className="text-red-500 text-sm mt-2">
+          Favorite Error: {favoriteError}
+        </p>
       )}
     </>
   );
