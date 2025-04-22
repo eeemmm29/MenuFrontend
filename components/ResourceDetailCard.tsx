@@ -1,13 +1,9 @@
+import { DetailItem } from "@/types";
 import { Button } from "@heroui/button";
 import { Card, CardBody, CardFooter, CardHeader } from "@heroui/card";
 import { Image } from "@heroui/image";
 import Link from "next/link";
 import React from "react";
-
-interface DetailItem {
-  label: string;
-  value: string | number | undefined;
-}
 
 interface ResourceDetailCardProps {
   title: string;
@@ -32,6 +28,11 @@ export const ResourceDetailCard: React.FC<ResourceDetailCardProps> = ({
   onBack,
   deleteError,
 }) => {
+  // Find the "Name" detail item
+  const nameDetail = details.find((item) => item.label === "Name");
+  // Filter out the "Name" detail item for the body
+  const otherDetails = details.filter((item) => item.label !== "Name");
+
   return (
     <>
       <h1 className="text-3xl font-bold mb-4">{title}</h1>
@@ -45,9 +46,11 @@ export const ResourceDetailCard: React.FC<ResourceDetailCardProps> = ({
             className="mb-4 rounded"
           />
         )}
-        <CardHeader className="text-2xl font-semibold">{title}</CardHeader>
+        <CardHeader className="text-2xl font-semibold">
+          {nameDetail?.value || title}
+        </CardHeader>
         <CardBody>
-          {details.map((item) =>
+          {otherDetails.map((item) =>
             item.value !== undefined ? (
               <p key={item.label}>
                 <span className="font-medium">{item.label}:</span> {item.value}

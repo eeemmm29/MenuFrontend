@@ -1,8 +1,8 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useEffect, useState, ReactNode } from "react";
 import { Button, Card, CardFooter } from "@heroui/react";
+import Link from "next/link";
+import { ReactNode, useEffect, useState } from "react";
 
 interface ResourceItem {
   id: number | string;
@@ -30,7 +30,6 @@ export default function ResourceList<T extends ResourceItem>({
   itemBasePath,
 }: ResourceListProps<T>) {
   const [items, setItems] = useState<T[]>([]);
-  const router = useRouter();
 
   useEffect(() => {
     fetchItems();
@@ -46,19 +45,11 @@ export default function ResourceList<T extends ResourceItem>({
     }
   };
 
-  const handleEdit = (id: number | string) => {
-    router.push(`${itemBasePath}/${id}/edit`);
-  };
-
-  const handleView = (id: number | string) => {
-    router.push(`${itemBasePath}/${id}`);
-  };
-
   return (
     <>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">{title}</h1>
-        <Button color="primary" onPress={() => router.push(newItemPath)}>
+        <Button color="primary" as={Link} href={newItemPath}>
           Add New{" "}
           {title
             .replace("Menu ", "")
@@ -78,14 +69,16 @@ export default function ResourceList<T extends ResourceItem>({
               <Button
                 size="sm"
                 variant="ghost"
-                onPress={() => handleEdit(item.id)}
+                as={Link}
+                href={`${itemBasePath}/${item.id}/edit`}
               >
                 Edit
               </Button>
               <Button
                 size="sm"
                 variant="ghost"
-                onPress={() => handleView(item.id)}
+                as={Link}
+                href={`${itemBasePath}/${item.id}`}
               >
                 View
               </Button>
