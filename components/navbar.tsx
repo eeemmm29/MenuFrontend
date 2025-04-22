@@ -129,7 +129,7 @@ export const Navbar = () => {
                     color="danger"
                     onPress={() => signOut()}
                   >
-                    Log Out
+                    Logout
                   </DropdownItem>
                 </DropdownMenu>
               </Dropdown>
@@ -185,21 +185,31 @@ export const Navbar = () => {
       <NavbarMenu>
         {/* {searchInput} */}
         <div className="mx-4 mt-2 flex flex-col gap-2">
-          {siteConfig.navMenuItems.map((item, index) => (
-            <NavbarMenuItem key={`${item}-${index}`}>
-              <Link
-                color={
-                  index === siteConfig.navMenuItems.length - 1
-                    ? "danger"
-                    : "foreground"
-                }
-                href={item.href}
-                size="lg"
-              >
-                {item.label}
-              </Link>
-            </NavbarMenuItem>
-          ))}
+          {siteConfig.navMenuItems.map((item, index) => {
+            if (item.protected && status !== "authenticated") {
+              return null;
+            }
+            return (
+              <NavbarMenuItem key={`${item}-${index}`}>
+                <Link
+                  color={
+                    index === siteConfig.navMenuItems.length - 1
+                      ? "danger"
+                      : "foreground"
+                  }
+                  onPress={
+                    index === siteConfig.navMenuItems.length - 1
+                      ? () => signOut()
+                      : undefined
+                  }
+                  href={item.href}
+                  size="lg"
+                >
+                  {item.label}
+                </Link>
+              </NavbarMenuItem>
+            );
+          })}
         </div>
       </NavbarMenu>
     </HeroUINavbar>

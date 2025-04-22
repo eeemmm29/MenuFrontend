@@ -41,8 +41,13 @@ export const siteConfig = {
   ],
   navMenuItems: [
     {
+      label: "About",
+      href: routes.about,
+    },
+    {
       label: "Profile",
       href: routes.profile,
+      protected: true,
     },
     // {
     //   label: "Dashboard",
@@ -79,10 +84,12 @@ export const siteConfig = {
     {
       label: "Favorites",
       href: routes.favorites,
+      protected: true,
     },
     {
       label: "Logout",
-      href: routes.logout,
+      href: "#",
+      protected: true,
     },
   ],
   links: {
