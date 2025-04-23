@@ -2,6 +2,7 @@ import { Button, Card, CardFooter } from "@heroui/react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { ReactNode, useEffect, useState } from "react";
+import FullScreenSpinner from "../common/FullScreenSpinner";
 
 interface ResourceItem {
   id: number | string;
@@ -29,11 +30,17 @@ export default function ResourceList<T extends ResourceItem>({
   itemBasePath,
 }: ResourceListProps<T>) {
   const { data: session } = useSession();
-  console.log("session", session);
   const [items, setItems] = useState<T[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetchItems();
+    const fetchData = async () => {
+      setIsLoading(true);
+      await fetchItems();
+      setIsLoading(false);
+    };
+
+    fetchData();
   }, []);
 
   const fetchItems = async () => {
@@ -50,7 +57,7 @@ export default function ResourceList<T extends ResourceItem>({
     <>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">{title}</h1>
-        {session?.user?.isAdmin && (
+        {!isLoading && session?.user?.isAdmin && (
           <Button color="primary" as={Link} href={newItemPath}>
             Add New{" "}
             {title
@@ -61,36 +68,42 @@ export default function ResourceList<T extends ResourceItem>({
         )}
       </div>
 
-      {items.length === 0 && <p>No {title.toLowerCase()} found.</p>}
+      {isLoading ? (
+        <FullScreenSpinner label={`Loading ${title}...`} />
+      ) : (
+        <>
+          {items.length === 0 && <p>No {title.toLowerCase()} found.</p>}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {items.map((item) => (
-          <Card key={item.id} shadow="sm">
-            {/* RenderItemCardBody is responsible for CardHeader and CardBody content */}
-            {renderItemCardBody(item)}
-            <CardFooter className="justify-end space-x-2">
-              {session?.user?.isAdmin && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  as={Link}
-                  href={`${itemBasePath}/${item.id}/edit`}
-                >
-                  Edit
-                </Button>
-              )}
-              <Button
-                size="sm"
-                variant="ghost"
-                as={Link}
-                href={`${itemBasePath}/${item.id}`}
-              >
-                View
-              </Button>
-            </CardFooter>
-          </Card>
-        ))}
-      </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {items.map((item) => (
+              <Card key={item.id} shadow="sm">
+                {/* RenderItemCardBody is responsible for CardHeader and CardBody content */}
+                {renderItemCardBody(item)}
+                <CardFooter className="justify-end space-x-2">
+                  {session?.user?.isAdmin && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      as={Link}
+                      href={`${itemBasePath}/${item.id}/edit`}
+                    >
+                      Edit
+                    </Button>
+                  )}
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    as={Link}
+                    href={`${itemBasePath}/${item.id}`}
+                  >
+                    View
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        </>
+      )}
     </>
   );
 }
