@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { SubmitHandler } from "react-hook-form";
+import FullScreenSpinner from "../common/FullScreenSpinner";
 import CategoryForm, { CategoryFormData } from "./form";
 
 export default function EditCategory() {
@@ -68,7 +69,7 @@ export default function EditCategory() {
     }
   };
 
-  if (isFetching) return <div>Loading category data...</div>;
+  if (isFetching) return <FullScreenSpinner label="Loading category data..." />;
   if (error && !isFetching && !initialData)
     return <div className="text-red-500">Error: {error}</div>;
   if (!session?.access) return <div>Please log in to edit this category.</div>;

@@ -10,6 +10,7 @@ import { deleteMenuItem, getMenuItemById } from "@/utils/backend/menuItems";
 import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import FullScreenSpinner from "../common/FullScreenSpinner";
 import { ResourceDetailCard } from "../resources/ResourceDetailCard";
 
 export default function MenuItemDetail() {
@@ -18,7 +19,7 @@ export default function MenuItemDetail() {
   const { data: session, status } = useSession(); // Get session status
   const router = useRouter();
   const [menuItem, setMenuItem] = useState<MenuItem | null>(null);
-  const [categoryName, setCategoryName] = useState<string>("Loading...");
+  const [categoryName, setCategoryName] = useState<string>(""); // Changed default to empty string
   const [isLoading, setIsLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
@@ -145,7 +146,7 @@ export default function MenuItemDetail() {
     }
   };
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <FullScreenSpinner />;
   if (fetchError)
     return <div className="text-red-500">Error: {fetchError}</div>;
   if (!menuItem) return <div>Menu item not found.</div>;

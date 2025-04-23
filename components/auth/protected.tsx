@@ -1,7 +1,8 @@
+import { routes } from "@/config/routes";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { routes } from "@/config/routes";
+import FullScreenSpinner from "../common/FullScreenSpinner";
 
 interface ProtectedProps {
   children: React.ReactNode;
@@ -72,7 +73,7 @@ const Protected: React.FC<ProtectedProps> = ({
   // --- Render logic ---
 
   if (isLoading) {
-    return <div>Loading...</div>; // Or a spinner component
+    return <FullScreenSpinner />;
   }
 
   // Allow access for unauthenticated users on forUnAuth routes

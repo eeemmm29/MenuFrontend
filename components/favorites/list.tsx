@@ -7,6 +7,7 @@ import { Card, CardBody, CardHeader, Image } from "@heroui/react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import FullScreenSpinner from "../common/FullScreenSpinner";
 
 export default function FavoritesList() {
   const { data: session } = useSession();
@@ -36,7 +37,7 @@ export default function FavoritesList() {
     }
   }, [session]);
 
-  if (isLoading) return <div>Loading favorites...</div>;
+  if (isLoading) return <FullScreenSpinner label="Loading favorites..." />;
   if (error) return <div className="text-red-500">{error}</div>;
 
   return (

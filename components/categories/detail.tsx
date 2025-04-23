@@ -4,6 +4,7 @@ import { deleteCategory, getCategoryById } from "@/utils/backend/categories";
 import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import FullScreenSpinner from "../common/FullScreenSpinner";
 import MenuItemsList from "../menu-items/list";
 import { ResourceDetailCard } from "../resources/ResourceDetailCard";
 
@@ -65,7 +66,7 @@ export default function CategoryDetail() {
     }
   };
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <FullScreenSpinner />;
   if (fetchError)
     return <div className="text-red-500">Error: {fetchError}</div>;
   if (!category) return <div>Category not found.</div>;
