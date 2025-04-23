@@ -29,6 +29,7 @@ export default function ResourceList<T extends ResourceItem>({
   itemBasePath,
 }: ResourceListProps<T>) {
   const { data: session } = useSession();
+  console.log("session", session);
   const [items, setItems] = useState<T[]>([]);
 
   useEffect(() => {

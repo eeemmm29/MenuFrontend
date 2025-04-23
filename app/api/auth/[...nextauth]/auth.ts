@@ -50,6 +50,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.user = user;
       }
 
+      console.log("token.accessExpiration", token.accessExpiration);
+
       // Return previous token if the access token has not expired
       if (Date.now() < token.accessExpiration) {
         return token;
@@ -86,19 +88,21 @@ async function refreshAccessToken(token: JWT) {
     if (response.data?.access) {
       return {
         ...token,
-        accessToken: response.data.access,
-        accessTokenExpires: response.data.accessExpiration,
-        refresh: response.data.refresh ?? token.refresh, // Fall back to old refresh token
+        access: response.data.access,
+        accessExpiration: new Date(response.data.accessExpiration).getTime(),
+        refresh: response.data.refresh ?? token.refresh,
       };
     }
 
-    throw new Error("Failed to refresh access token");
+    throw new Error(
+      "Failed to refresh access token: No access token in response"
+    );
   } catch (error) {
     console.error("Error refreshing access token:", error);
 
     return {
       ...token,
-      error: "RefreshAccessTokenError",
+      error: "RefreshAccessTokenError", // Signifies refresh failure
     };
   }
 }
