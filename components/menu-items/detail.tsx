@@ -1,13 +1,11 @@
 import { routes } from "@/config/routes";
 import { MenuItem } from "@/types/backend/menuItems";
-import { getCategoryById } from "@/utils/backend/categories";
 import {
   addFavorite,
   getFavorites,
   removeFavorite,
 } from "@/utils/backend/favorites";
 import { deleteMenuItem, getMenuItemById } from "@/utils/backend/menuItems";
-import { Spinner } from "@heroui/react";
 import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -17,41 +15,29 @@ import { ResourceDetailCard } from "../resources/ResourceDetailCard";
 export default function MenuItemDetail() {
   const { id } = useParams();
   const menuItemId = Number(id);
-  const { data: session, status } = useSession(); // Get session status
+  const { data: session, status } = useSession();
   const router = useRouter();
   const [menuItem, setMenuItem] = useState<MenuItem | null>(null);
-  const [categoryName, setCategoryName] = useState<string>("");
-  const [isCategoryLoading, setIsCategoryLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [isFavorited, setIsFavorited] = useState(false); // State for favorite status
-  const [favoriteId, setFavoriteId] = useState<number | null>(null); // State for favorite ID
-  const [isFavoriteLoading, setIsFavoriteLoading] = useState(false); // Loading state for favorite action
-  const [favoriteError, setFavoriteError] = useState<string | null>(null); // Error state for favorite action
+  const [isFavorited, setIsFavorited] = useState(false);
+  const [favoriteId, setFavoriteId] = useState<number | null>(null);
+  const [isFavoriteLoading, setIsFavoriteLoading] = useState(false);
+  const [favoriteError, setFavoriteError] = useState<string | null>(null);
 
   // Fetch Menu Item and Check Favorite Status
   useEffect(() => {
     if (menuItemId) {
       setIsLoading(true);
-      setIsCategoryLoading(true); // Start category loading
       getMenuItemById(menuItemId)
         .then((data) => {
           setMenuItem(data);
           setFetchError(null);
-          if (data.category) {
-            getCategoryById(data.category)
-              .then((catData) => setCategoryName(catData.name))
-              .catch(() => setCategoryName("Unknown Category"))
-              .finally(() => setIsCategoryLoading(false)); // End category loading
-          } else {
-            setCategoryName("N/A");
-            setIsCategoryLoading(false); // End category loading if no category
-          }
           // Check favorite status only if user is logged in
           if (session?.access) {
-            setIsFavoriteLoading(true); // Start loading favorite status
+            setIsFavoriteLoading(true);
             getFavorites(session.access)
               .then((favData) => {
                 const foundFavorite = favData.results.find(
@@ -71,14 +57,13 @@ export default function MenuItemDetail() {
                 setIsFavorited(false);
                 setFavoriteId(null);
               })
-              .finally(() => setIsFavoriteLoading(false)); // Finish loading favorite status
+              .finally(() => setIsFavoriteLoading(false));
           }
         })
         .catch((err) => {
           console.error("Failed to fetch menu item:", err);
           setFetchError(err.message || "Failed to load menu item details.");
           setMenuItem(null);
-          setIsCategoryLoading(false); // End category loading on error
         })
         .finally(() => {
           setIsLoading(false);
@@ -86,12 +71,10 @@ export default function MenuItemDetail() {
     } else {
       setFetchError("Invalid menu item ID.");
       setIsLoading(false);
-      setIsCategoryLoading(false); // End category loading if invalid ID
     }
-  }, [menuItemId, session]); // Re-run if session changes (login/logout)
+  }, [menuItemId, session]);
 
   const handleDelete = async () => {
-    // ... existing handleDelete code ...
     if (!menuItem || !session?.access) {
       setDeleteError(
         "Cannot delete menu item. Missing data or authentication."
@@ -103,13 +86,13 @@ export default function MenuItemDetail() {
     );
     if (confirmDelete) {
       setIsDeleting(true);
-      setDeleteError(null); // Clear previous delete errors
+      setDeleteError(null);
       try {
         if (!menuItem.id) {
           throw new Error("Menu item ID is missing.");
         }
         await deleteMenuItem(menuItem.id, session.access);
-        router.push(routes.menuItems); // Redirect to menu items list on success
+        router.push(routes.menuItems);
       } catch (err: any) {
         console.error("Failed to delete menu item:", err);
         setDeleteError(
@@ -121,7 +104,6 @@ export default function MenuItemDetail() {
     }
   };
 
-  // Handle Add/Remove Favorite
   const handleToggleFavorite = async () => {
     if (!session?.access || !menuItem) {
       setFavoriteError("Please log in to manage favorites.");
@@ -133,12 +115,10 @@ export default function MenuItemDetail() {
 
     try {
       if (isFavorited && favoriteId) {
-        // Remove from favorites
         await removeFavorite(favoriteId, session.access);
         setIsFavorited(false);
         setFavoriteId(null);
       } else {
-        // Add to favorites
         const newFavorite = await addFavorite(menuItem.id, session.access);
         setIsFavorited(true);
         setFavoriteId(newFavorite.id);
@@ -162,7 +142,7 @@ export default function MenuItemDetail() {
     { label: "Name", value: menuItem.name },
     {
       label: "Category",
-      value: isCategoryLoading ? <Spinner size="sm" /> : categoryName, // Show spinner or name
+      value: menuItem.categoryName ?? "N/A",
     },
     { label: "Price", value: `$${menuItem.price.toFixed(2)}` },
     { label: "Description", value: menuItem.description },
@@ -179,8 +159,7 @@ export default function MenuItemDetail() {
         isDeleting={isDeleting}
         canEditDelete={!!session?.user?.isAdmin}
         deleteError={deleteError}
-        // Pass favorite props down
-        showFavoriteButton={status === "authenticated"} // Only show if logged in
+        showFavoriteButton={status === "authenticated"}
         isFavorited={isFavorited}
         isFavoriteLoading={isFavoriteLoading}
         onToggleFavorite={handleToggleFavorite}
