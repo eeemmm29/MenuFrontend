@@ -1,12 +1,12 @@
 "use client";
 
-import type { ThemeProviderProps } from "next-themes";
-
-import * as React from "react";
+import SessionErrorHandler from "@/utils/backend/session-error-handler";
 import { HeroUIProvider } from "@heroui/system";
-import { useRouter } from "next/navigation";
-import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { SessionProvider } from "next-auth/react";
+import type { ThemeProviderProps } from "next-themes";
+import { ThemeProvider as NextThemesProvider } from "next-themes";
+import { useRouter } from "next/navigation";
+import * as React from "react";
 
 export interface ProvidersProps {
   children: React.ReactNode;
@@ -27,7 +27,9 @@ export function Providers({ children, themeProps }: ProvidersProps) {
   return (
     <SessionProvider>
       <HeroUIProvider navigate={router.push}>
-        <NextThemesProvider {...themeProps}>{children}</NextThemesProvider>
+        <SessionErrorHandler>
+          <NextThemesProvider {...themeProps}>{children}</NextThemesProvider>
+        </SessionErrorHandler>
       </HeroUIProvider>
     </SessionProvider>
   );

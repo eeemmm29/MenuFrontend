@@ -1,5 +1,5 @@
 import axios from "axios";
-import NextAuth from "next-auth";
+import NextAuth, { User } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import Credentials from "next-auth/providers/credentials";
 
@@ -40,33 +40,40 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     strategy: "jwt",
   },
   callbacks: {
-    jwt: async ({ token, user }) => {
-      // If this is a login, attach the tokens and user info.
-      if (user) {
+    jwt: async ({ token, user, account }) => {
+      // Initial sign in
+      if (account && user) {
+        // Separate user data from token data received from authorize
+        token.user = {
+          id: user.id,
+          username: user.username,
+          email: user.email, // Add other user fields as needed
+          isAdmin: user.isAdmin,
+        };
         token.access = user.access;
         token.refresh = user.refresh;
         token.accessExpiration = new Date(user.accessExpiration).getTime();
         token.refreshExpiration = new Date(user.refreshExpiration).getTime();
-        token.user = user;
+        // Clear the error on successful sign-in
+        delete token.error;
+        return token;
       }
 
-      console.log("token.accessExpiration", token.accessExpiration);
-
-      // Return previous token if the access token has not expired
+      // Return previous token if the access token has not expired yet
       if (Date.now() < token.accessExpiration) {
         return token;
       }
 
       // Access token has expired, try to refresh it
-      return await refreshAccessToken(token);
+      return refreshAccessToken(token);
     },
     session: async ({ session, token }) => {
-      // Pass user info from token to session
-      if (token.user) {
-        session.user = token.user;
-      }
-      session.access = token.access;
-      session.refresh = token.refresh;
+      // Send properties to the client, like user details and current tokens/error
+      session.user = token.user as User; // User details
+      session.access = token.access; // Current access token
+      session.refresh = token.refresh; // Current refresh token
+      session.error = token.error as string | undefined; // Any token refresh error
+
       return session;
     },
   },
@@ -76,7 +83,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
 });
 
-async function refreshAccessToken(token: JWT) {
+const refreshAccessToken = async (token: JWT) => {
   try {
     const response = await axios.post(
       `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/token/refresh`,
@@ -105,4 +112,4 @@ async function refreshAccessToken(token: JWT) {
       error: "RefreshAccessTokenError", // Signifies refresh failure
     };
   }
-}
+};
