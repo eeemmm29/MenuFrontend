@@ -20,7 +20,7 @@ export type MenuItemFormData = Omit<MenuItem, "id" | "image"> & {
 
 interface MenuItemFormProps {
   onSubmit: SubmitHandler<MenuItemFormData>;
-  initialData?: Partial<MenuItemFormData>; // Make initialData partial for create form
+  initialData?: MenuItemFormData;
   currentImageUrl?: string;
   isLoading: boolean;
   error?: string | null;

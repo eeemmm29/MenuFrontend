@@ -17,9 +17,7 @@ export default function EditMenuItem() {
   const [isLoading, setIsLoading] = useState(false); // Submission loading
   const [isFetching, setIsFetching] = useState(true); // Initial data fetching
   const [error, setError] = useState<string | null>(null);
-  const [initialData, setInitialData] = useState<
-    Partial<MenuItemFormData> | undefined
-  >(undefined);
+  const [initialData, setInitialData] = useState<MenuItemFormData>();
   const [currentImageUrl, setCurrentImageUrl] = useState<string | undefined>(
     undefined
   );
