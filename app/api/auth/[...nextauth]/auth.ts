@@ -1,5 +1,5 @@
 import axios from "axios";
-import NextAuth from "next-auth";
+import NextAuth, { User } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import Credentials from "next-auth/providers/credentials";
 
@@ -61,12 +61,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return await refreshAccessToken(token);
     },
     session: async ({ session, token }) => {
-      // Pass user info from token to session
-      if (token.user) {
-        session.user = token.user;
-      }
+      // Pass user info and token details (including error) from token to session
+      session.user = token.user as User;
       session.access = token.access;
       session.refresh = token.refresh;
+      session.error = token.error as string | undefined;
       return session;
     },
   },
