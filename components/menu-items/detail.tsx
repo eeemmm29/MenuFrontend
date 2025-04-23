@@ -7,6 +7,7 @@ import {
   removeFavorite,
 } from "@/utils/backend/favorites";
 import { deleteMenuItem, getMenuItemById } from "@/utils/backend/menuItems";
+import { Spinner } from "@heroui/react";
 import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -19,7 +20,8 @@ export default function MenuItemDetail() {
   const { data: session, status } = useSession(); // Get session status
   const router = useRouter();
   const [menuItem, setMenuItem] = useState<MenuItem | null>(null);
-  const [categoryName, setCategoryName] = useState<string>(""); // Changed default to empty string
+  const [categoryName, setCategoryName] = useState<string>("");
+  const [isCategoryLoading, setIsCategoryLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
@@ -33,6 +35,7 @@ export default function MenuItemDetail() {
   useEffect(() => {
     if (menuItemId) {
       setIsLoading(true);
+      setIsCategoryLoading(true); // Start category loading
       getMenuItemById(menuItemId)
         .then((data) => {
           setMenuItem(data);
@@ -40,9 +43,11 @@ export default function MenuItemDetail() {
           if (data.category) {
             getCategoryById(data.category)
               .then((catData) => setCategoryName(catData.name))
-              .catch(() => setCategoryName("Unknown Category"));
+              .catch(() => setCategoryName("Unknown Category"))
+              .finally(() => setIsCategoryLoading(false)); // End category loading
           } else {
             setCategoryName("N/A");
+            setIsCategoryLoading(false); // End category loading if no category
           }
           // Check favorite status only if user is logged in
           if (session?.access) {
@@ -73,6 +78,7 @@ export default function MenuItemDetail() {
           console.error("Failed to fetch menu item:", err);
           setFetchError(err.message || "Failed to load menu item details.");
           setMenuItem(null);
+          setIsCategoryLoading(false); // End category loading on error
         })
         .finally(() => {
           setIsLoading(false);
@@ -80,6 +86,7 @@ export default function MenuItemDetail() {
     } else {
       setFetchError("Invalid menu item ID.");
       setIsLoading(false);
+      setIsCategoryLoading(false); // End category loading if invalid ID
     }
   }, [menuItemId, session]); // Re-run if session changes (login/logout)
 
@@ -153,7 +160,10 @@ export default function MenuItemDetail() {
 
   const menuItemDetails = [
     { label: "Name", value: menuItem.name },
-    { label: "Category", value: categoryName },
+    {
+      label: "Category",
+      value: isCategoryLoading ? <Spinner size="sm" /> : categoryName, // Show spinner or name
+    },
     { label: "Price", value: `$${menuItem.price.toFixed(2)}` },
     { label: "Description", value: menuItem.description },
   ];
