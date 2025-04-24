@@ -12,7 +12,6 @@ interface MenuItemCardBodyProps {
   item: MenuItem;
   isLoading?: boolean;
   isAuthenticated: boolean;
-  isFavorite?: boolean;
   toggleFavorite: (item: MenuItem) => Promise<void>;
 }
 
@@ -20,7 +19,6 @@ const MenuItemCardBody: React.FC<MenuItemCardBodyProps> = ({
   item,
   isLoading,
   isAuthenticated,
-  isFavorite,
   toggleFavorite,
 }) => {
   return (
@@ -45,9 +43,9 @@ const MenuItemCardBody: React.FC<MenuItemCardBodyProps> = ({
               isIconOnly
               size="sm"
               color="danger"
-              variant={isFavorite ? "solid" : "bordered"}
+              variant={item.isFavorite ? "solid" : "bordered"}
               aria-label={
-                isFavorite ? "Remove from favorites" : "Add to favorites"
+                item.isFavorite ? "Remove from favorites" : "Add to favorites"
               }
               onClick={(e) => {
                 e.preventDefault();
@@ -56,7 +54,7 @@ const MenuItemCardBody: React.FC<MenuItemCardBodyProps> = ({
               }}
               isLoading={isLoading}
             >
-              {isFavorite ? (
+              {item.isFavorite ? (
                 <HeartFilledIcon size={18} />
               ) : (
                 <HeartIcon size={18} />

@@ -7,4 +7,5 @@ export interface MenuItem {
   categoryName?: string; // Add optional category name
   image?: string;
   isAvailable: boolean; // Add isAvailable field
+  isFavorite: boolean; // Add optional isFavorite field
 }

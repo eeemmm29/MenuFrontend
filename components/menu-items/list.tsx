@@ -1,13 +1,9 @@
 import { routes } from "@/config/routes";
 import { MenuItem } from "@/types/backend/menuItems";
-import {
-  addFavorite,
-  getFavorites,
-  removeFavorite,
-} from "@/utils/backend/favorites";
+import { addFavorite, removeFavorite } from "@/utils/backend/favorites";
 import { getMenuItems } from "@/utils/backend/menuItems";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import ResourceList from "../resources/ResourceList";
 import MenuItemCardBody from "./card-body";
 
@@ -21,61 +17,27 @@ const MenuItemsList: React.FC<MenuItemsListProps> = ({
   isFavorites,
 }) => {
   const { data: session, status } = useSession();
-  const [favoritesMap, setFavoritesMap] = useState<Map<number, number>>(
-    new Map()
-  ); // Map<menuItemId, favoriteId>
   const [loadingFavoriteMenuItemId, setLoadingFavoriteMenuItemId] = useState<
     number | null
   >(null);
   const [favoriteError, setFavoriteError] = useState<string | null>(null);
 
-  // Fetch favorites when session is available
-  useEffect(() => {
-    if (status === "authenticated" && session?.access) {
-      getFavorites(session.access)
-        .then((data) => {
-          const favMap = new Map<number, number>();
-          data.results.forEach((fav) => {
-            favMap.set(fav.menuItem.id, fav.id);
-          });
-          setFavoritesMap(favMap);
-        })
-        .catch((err) => {
-          console.error("Failed to fetch favorites:", err);
-          setFavoriteError("Could not load favorite status.");
-        });
-    }
-  }, [session, status]);
-
   const handleToggleFavorite = async (menuItem: MenuItem) => {
-    if (!session?.access) {
+    if (!session?.access || status !== "authenticated") {
       setFavoriteError("Please log in to manage favorites.");
       return;
     }
 
-    const isCurrentlyFavorited = favoritesMap.has(menuItem.id);
-    const favoriteId = favoritesMap.get(menuItem.id);
+    const currentIsFavorite = menuItem.isFavorite;
 
     setLoadingFavoriteMenuItemId(menuItem.id);
     setFavoriteError(null);
 
     try {
-      if (isCurrentlyFavorited && favoriteId) {
-        // Remove from favorites
-        await removeFavorite(favoriteId, session.access);
-        setFavoritesMap((prevMap) => {
-          const newMap = new Map(prevMap);
-          newMap.delete(menuItem.id);
-          return newMap;
-        });
+      if (currentIsFavorite) {
+        await removeFavorite(menuItem.id, session.access);
       } else {
-        // Add to favorites
-        const newFavorite = await addFavorite(menuItem.id, session.access);
-        setFavoritesMap((prevMap) => {
-          const newMap = new Map(prevMap);
-          newMap.set(menuItem.id, newFavorite.id);
-          return newMap;
-        });
+        await addFavorite(menuItem.id, session.access);
       }
     } catch (err: any) {
       console.error("Failed to toggle favorite:", err);
@@ -89,7 +51,6 @@ const MenuItemsList: React.FC<MenuItemsListProps> = ({
   };
 
   const renderMenuItemCardBody = (item: MenuItem) => {
-    const isFavorite = favoritesMap.has(item.id);
     const isLoading = loadingFavoriteMenuItemId === item.id;
 
     return (
@@ -97,7 +58,6 @@ const MenuItemsList: React.FC<MenuItemsListProps> = ({
         item={item}
         isLoading={isLoading}
         isAuthenticated={status === "authenticated"}
-        isFavorite={isFavorite}
         toggleFavorite={handleToggleFavorite}
       />
     );
@@ -111,13 +71,14 @@ const MenuItemsList: React.FC<MenuItemsListProps> = ({
 
   return (
     <>
-      {/* Display favorite error globally for the list */}
       {favoriteError && (
         <p className="text-red-500 text-sm mb-4">Error: {favoriteError}</p>
       )}
       <ResourceList<MenuItem>
         title={title}
-        fetchFunction={() => getMenuItems(categoryId, isFavorites)}
+        fetchFunction={() =>
+          getMenuItems(categoryId, session?.access, isFavorites)
+        }
         newItemPath={routes.newMenuItem}
         renderItemCardBody={renderMenuItemCardBody} // Pass the function defined above
         itemBasePath={routes.menuItems}

@@ -17,7 +17,7 @@ interface ResourceDetailCardProps {
   deleteError?: string | null;
   // Favorite props
   showFavoriteButton?: boolean;
-  isFavorited?: boolean;
+  isFavorite?: boolean;
   isFavoriteLoading?: boolean;
   onToggleFavorite?: () => Promise<void>;
   favoriteError?: string | null;
@@ -34,7 +34,7 @@ export const ResourceDetailCard: React.FC<ResourceDetailCardProps> = ({
   deleteError,
   // Favorite props
   showFavoriteButton = false,
-  isFavorited = false,
+  isFavorite = false,
   isFavoriteLoading = false,
   onToggleFavorite,
   favoriteError,
@@ -52,14 +52,14 @@ export const ResourceDetailCard: React.FC<ResourceDetailCardProps> = ({
           <Button
             isIconOnly
             color="danger"
-            variant={isFavorited ? "solid" : "bordered"}
+            variant={isFavorite ? "solid" : "bordered"}
             aria-label={
-              isFavorited ? "Remove from favorites" : "Add to favorites"
+              isFavorite ? "Remove from favorites" : "Add to favorites"
             }
             onPress={onToggleFavorite}
             isLoading={isFavoriteLoading}
           >
-            {isFavorited ? <HeartFilledIcon /> : <HeartIcon />}
+            {isFavorite ? <HeartFilledIcon /> : <HeartIcon />}
           </Button>
         )}
       </h1>
