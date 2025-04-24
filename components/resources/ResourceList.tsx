@@ -20,6 +20,7 @@ interface ResourceListProps<T extends ResourceItem> {
   newItemPath: string;
   renderItemCardBody: (item: T) => ReactNode;
   itemBasePath: string; // e.g., "/menu-items" or "/categories"
+  showAddNewButton?: boolean;
 }
 
 export default function ResourceList<T extends ResourceItem>({
@@ -28,6 +29,7 @@ export default function ResourceList<T extends ResourceItem>({
   newItemPath,
   renderItemCardBody,
   itemBasePath,
+  showAddNewButton = true,
 }: ResourceListProps<T>) {
   const { data: session } = useSession();
   const [items, setItems] = useState<T[]>([]);
@@ -57,7 +59,7 @@ export default function ResourceList<T extends ResourceItem>({
     <>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">{title}</h1>
-        {!isLoading && session?.user?.isAdmin && (
+        {!isLoading && session?.user?.isAdmin && showAddNewButton && (
           <Button color="primary" as={Link} href={newItemPath}>
             Add New{" "}
             {title

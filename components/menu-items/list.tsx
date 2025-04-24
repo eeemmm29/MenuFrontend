@@ -6,18 +6,20 @@ import {
   removeFavorite,
 } from "@/utils/backend/favorites";
 import { getMenuItems } from "@/utils/backend/menuItems";
-import { Button } from "@heroui/button";
-import { CardBody, CardHeader } from "@heroui/card";
-import { Chip } from "@heroui/chip";
-import { Image } from "@heroui/image";
-import clsx from "clsx";
 import { useSession } from "next-auth/react";
-import Link from "next/link";
 import { useEffect, useState } from "react";
-import { HeartFilledIcon, HeartIcon } from "../icons";
 import ResourceList from "../resources/ResourceList";
+import MenuItemCardBody from "./card-body";
 
-const MenuItemsList = ({ categoryId }: { categoryId?: number }) => {
+interface MenuItemsListProps {
+  categoryId?: number;
+  isFavorites?: boolean;
+}
+
+const MenuItemsList: React.FC<MenuItemsListProps> = ({
+  categoryId,
+  isFavorites,
+}) => {
   const { data: session, status } = useSession();
   const [favoritesMap, setFavoritesMap] = useState<Map<number, number>>(
     new Map()
@@ -91,72 +93,21 @@ const MenuItemsList = ({ categoryId }: { categoryId?: number }) => {
     const isLoading = loadingFavoriteMenuItemId === item.id;
 
     return (
-      <>
-        <CardHeader
-          as={Link}
-          href={`${routes.menuItems}/${item.id}`}
-          className="flex-col"
-        >
-          {item.image && (
-            <Image
-              alt={item.name}
-              className="aspect-video object-cover"
-              src={item.image}
-              isZoomed
-            />
-          )}
-          <div className="flex flex-row items-start justify-between w-full mt-2">
-            <h2 className="text-xl font-semibold">{item.name}</h2>
-            {status === "authenticated" && (
-              <Button
-                isIconOnly
-                size="sm"
-                color="danger"
-                variant={isFavorite ? "solid" : "bordered"}
-                aria-label={
-                  isFavorite ? "Remove from favorites" : "Add to favorites"
-                }
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleToggleFavorite(item);
-                }}
-                isLoading={isLoading}
-              >
-                {isFavorite ? (
-                  <HeartFilledIcon size={18} />
-                ) : (
-                  <HeartIcon size={18} />
-                )}
-              </Button>
-            )}
-          </div>
-        </CardHeader>
-        <CardBody className="justify-between">
-          <p className="text-gray-600 dark:text-gray-400 mb-2 line-clamp-2">
-            {item.description}
-          </p>
-          <div className="flex justify-between items-center">
-            <p className="text-lg font-semibold text-green-600">
-              ${item.price.toFixed(2)}
-            </p>
-            <Chip
-              color="success"
-              className={clsx(
-                item.isAvailable
-                  ? "bg-green-100 text-green-800"
-                  : "bg-red-100 text-red-800"
-              )}
-            >
-              {item.isAvailable ? "Available" : "Not Available"}
-            </Chip>
-          </div>
-        </CardBody>
-      </>
+      <MenuItemCardBody
+        item={item}
+        isLoading={isLoading}
+        isAuthenticated={status === "authenticated"}
+        isFavorite={isFavorite}
+        toggleFavorite={handleToggleFavorite}
+      />
     );
   };
 
-  const title = categoryId ? "Menu Items in this Category" : "Menu Items";
+  const title = isFavorites
+    ? "Your Favorite Menu Items"
+    : categoryId
+      ? "Menu Items in this Category"
+      : "Menu Items";
 
   return (
     <>
@@ -166,10 +117,11 @@ const MenuItemsList = ({ categoryId }: { categoryId?: number }) => {
       )}
       <ResourceList<MenuItem>
         title={title}
-        fetchFunction={() => getMenuItems(categoryId)}
+        fetchFunction={() => getMenuItems(categoryId, isFavorites)}
         newItemPath={routes.newMenuItem}
         renderItemCardBody={renderMenuItemCardBody} // Pass the function defined above
         itemBasePath={routes.menuItems}
+        showAddNewButton={!isFavorites}
       />
     </>
   );
