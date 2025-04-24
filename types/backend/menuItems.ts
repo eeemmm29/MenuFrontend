@@ -6,4 +6,5 @@ export interface MenuItem {
   category: number;
   categoryName?: string; // Add optional category name
   image?: string;
+  isAvailable: boolean; // Add isAvailable field
 }

@@ -146,6 +146,10 @@ export default function MenuItemDetail() {
     },
     { label: "Price", value: `$${menuItem.price.toFixed(2)}` },
     { label: "Description", value: menuItem.description },
+    {
+      label: "Availability",
+      value: menuItem.isAvailable ? "Available" : "Not Available",
+    }, // Add Availability
   ];
 
   return (

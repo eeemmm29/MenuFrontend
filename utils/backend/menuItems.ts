@@ -19,23 +19,30 @@ export const getMenuItemById = async (id: number): Promise<MenuItem> => {
 };
 
 export const createMenuItem = async (
-  menuItem: Omit<MenuItem, "id">,
+  menuItemData: FormData, // Expect FormData
   token: string
 ) => {
-  const data = await fetchBackend("/api/menu-items/", "post", menuItem, token);
+  // ContentType will be set by axios for FormData
+  const data = await fetchBackend(
+    "/api/menu-items/",
+    "post",
+    menuItemData,
+    token
+  );
   return data;
 };
 
 export const updateMenuItem = async (
   id: number,
-  menuItem: Partial<Omit<MenuItem, "id">>,
-  token: string // Add token parameter
+  menuItemData: FormData, // Expect FormData
+  token: string
 ) => {
-  // Pass token to fetchBackend
+  // Use PATCH for partial updates, especially with optional images
+  // ContentType will be set by axios for FormData
   const data = await fetchBackend(
     `/api/menu-items/${id}/`,
-    "put",
-    menuItem,
+    "patch", // Use PATCH
+    menuItemData,
     token
   );
   return data;

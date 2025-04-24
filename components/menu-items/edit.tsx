@@ -33,6 +33,7 @@ export default function EditMenuItem() {
             description: data.description,
             price: data.price,
             category: data.category,
+            isAvailable: data.isAvailable, // Fetch isAvailable
           });
           setCurrentImageUrl(data.image);
           setError(null);
@@ -67,19 +68,22 @@ export default function EditMenuItem() {
     setIsLoading(true);
     setError(null);
 
-    const priceAsNumber =
-      typeof data.price === "string" ? parseFloat(data.price) : data.price;
-    const payload: Partial<Omit<MenuItem, "id" | "image">> = {
-      name: data.name,
-      description: data.description,
-      price: priceAsNumber,
-      category: Number(data.category),
-    };
+    // Create FormData
+    const formData = new FormData();
+    formData.append("name", data.name);
+    formData.append("description", data.description);
+    formData.append("price", String(data.price));
+    formData.append("category", String(data.category));
+    formData.append("isAvailable", String(data.isAvailable));
 
-    // Image update not handled here
+    // Append image only if a new one is selected
+    if (data.image && data.image.length > 0) {
+      formData.append("image", data.image[0]);
+    }
 
     try {
-      await updateMenuItem(menuItemId, payload, token);
+      // Use updateMenuItem with FormData
+      await updateMenuItem(menuItemId, formData, token);
       router.push(routes.menuItemDetail(menuItemId));
     } catch (err: any) {
       console.error("Failed to update menu item:", err);

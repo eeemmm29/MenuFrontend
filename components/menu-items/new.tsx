@@ -23,21 +23,22 @@ export default function NewMenuItem() {
     setIsLoading(true);
     setError(null);
 
-    // Convert price to number if it's a string (should be handled by react-hook-form valueAsNumber)
-    const priceAsNumber =
-      typeof data.price === "string" ? parseFloat(data.price) : data.price;
+    // Create FormData
+    const formData = new FormData();
+    formData.append("name", data.name);
+    formData.append("description", data.description);
+    // Convert price to string for FormData
+    formData.append("price", String(data.price));
+    formData.append("category", String(data.category));
+    formData.append("isAvailable", String(data.isAvailable));
 
-    // Prepare payload, ensuring category is a number
-    const payload: Omit<MenuItem, "id" | "image"> = {
-      ...data,
-      price: priceAsNumber,
-      category: Number(data.category),
-    };
-
-    // TODO: Handle image upload separately if needed
+    // Append image if selected
+    if (data.image && data.image.length > 0) {
+      formData.append("image", data.image[0]);
+    }
 
     try {
-      await createMenuItem(payload, token);
+      await createMenuItem(formData, token);
       router.push(routes.menuItems); // Redirect on success
     } catch (err: any) {
       console.error("Failed to create menu item:", err);
