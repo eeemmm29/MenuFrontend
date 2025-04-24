@@ -58,7 +58,10 @@ export default function SignUp() {
 
         <Input
           isRequired
-          errorMessage={errors.username?.message?.toString()}
+          errorMessage={
+            errors.username?.message?.toString() ||
+            "Please enter a valid username"
+          }
           label="Username"
           labelPlacement="outside"
           placeholder="Enter your username"
@@ -67,7 +70,10 @@ export default function SignUp() {
         />
         <Input
           isRequired
-          errorMessage={errors.password1?.message?.toString()}
+          errorMessage={
+            errors.password1?.message?.toString() ||
+            "Please enter a valid password"
+          }
           label="Password"
           labelPlacement="outside"
           placeholder="Enter your password"
@@ -76,7 +82,10 @@ export default function SignUp() {
         />
         <Input
           isRequired
-          errorMessage={errors.password2?.message?.toString()}
+          errorMessage={
+            errors.password2?.message?.toString() ||
+            "Please confirm your password"
+          }
           label="Confirm Password"
           labelPlacement="outside"
           placeholder="Confirm your password"
