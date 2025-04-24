@@ -1,8 +1,7 @@
 @echo off
 SET CONTAINER_NAME=menu-frontend
 SET IMAGE_NAME=menu-frontend
-REM Copy dev environment variables to .env
-copy .env.local .env
+
 REM Stop any running containers with the name 'menu-frontend'
 docker ps -q -f name=%CONTAINER_NAME% >nul 2>nul
 IF NOT ERRORLEVEL 1 (
@@ -28,9 +27,9 @@ IF ERRORLEVEL 1 (
 echo Docker image built successfully.
 
 echo Running the Docker container...
-REM Note: You might need to pass environment variables like NEXT_PUBLIC_BACKEND_URL here
-REM Example: docker run --name %CONTAINER_NAME% -p 3000:3000 -e NEXT_PUBLIC_BACKEND_URL=http://localhost:8000 -d %IMAGE_NAME%
-docker run --name %CONTAINER_NAME% -p 3000:3000 --env-file .env -d %IMAGE_NAME%
+REM Pass the INTERNAL_BACKEND_URL specifically for the container environment
+REM Use --env-file for other variables from .env
+docker run --name %CONTAINER_NAME% -p 3000:3000 --env-file .env.local -e INTERNAL_BACKEND_URL=http://host.docker.internal:8000 -d %IMAGE_NAME%
 IF ERRORLEVEL 1 (
     echo Docker container run failed. Exiting.
     exit /b 1

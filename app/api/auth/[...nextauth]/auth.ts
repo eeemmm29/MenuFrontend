@@ -3,6 +3,25 @@ import NextAuth, { User } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import Credentials from "next-auth/providers/credentials";
 
+// Helper function to get the backend URL
+const getBackendUrl = () => {
+  const internalUrl = process.env.INTERNAL_BACKEND_URL?.trim();
+  const publicUrl = process.env.NEXT_PUBLIC_BACKEND_URL?.trim();
+
+  if (internalUrl) {
+    console.log("Using INTERNAL_BACKEND_URL:", internalUrl);
+    return internalUrl;
+  }
+  if (publicUrl) {
+    console.log("Using NEXT_PUBLIC_BACKEND_URL:", publicUrl);
+    return publicUrl;
+  }
+  console.error(
+    "ERROR: Neither INTERNAL_BACKEND_URL nor NEXT_PUBLIC_BACKEND_URL is defined!"
+  );
+  return null; // Indicate failure
+};
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Credentials({
@@ -14,13 +33,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         password: { label: "Password", type: "password" },
       },
       authorize: async (credentials) => {
-        const res = await axios.post(
-          `${process.env.INTERNAL_BACKEND_URL}/auth/login`,
-          {
-            username: credentials.username,
-            password: credentials.password,
-          }
-        );
+        const backendUrl = getBackendUrl();
+        if (!backendUrl) {
+          console.error("Authorization failed: Backend URL is not configured.");
+          return null;
+        }
+        const res = await axios.post(`${backendUrl}/auth/login`, {
+          username: credentials.username,
+          password: credentials.password,
+        });
         if (res.data?.access) {
           // Return the user object along with the tokens.
           return {
@@ -84,13 +105,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 });
 
 const refreshAccessToken = async (token: JWT) => {
+  const backendUrl = getBackendUrl();
+  if (!backendUrl) {
+    console.error("Token refresh failed: Backend URL is not configured.");
+    return { ...token, error: "BackendUrlNotConfigured" };
+  }
+
   try {
-    const response = await axios.post(
-      `${process.env.INTERNAL_BACKEND_URL}/auth/token/refresh`,
-      {
-        refresh: token.refresh,
-      }
-    );
+    const response = await axios.post(`${backendUrl}/auth/token/refresh`, {
+      refresh: token.refresh,
+    });
 
     if (response.data?.access) {
       return {
@@ -98,6 +122,7 @@ const refreshAccessToken = async (token: JWT) => {
         access: response.data.access,
         accessExpiration: new Date(response.data.accessExpiration).getTime(),
         refresh: response.data.refresh ?? token.refresh,
+        error: undefined, // Clear previous errors
       };
     }
 
