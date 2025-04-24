@@ -13,12 +13,12 @@ import MenuItemCardBody from "./card-body";
 
 interface MenuItemsListProps {
   categoryId?: number;
-  isFavorites?: boolean;
+  favoritesOnly?: boolean;
 }
 
 const MenuItemsList: React.FC<MenuItemsListProps> = ({
   categoryId,
-  isFavorites,
+  favoritesOnly,
 }) => {
   const { data: session, status } = useSession();
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
@@ -32,7 +32,7 @@ const MenuItemsList: React.FC<MenuItemsListProps> = ({
     const loadMenuItems = async () => {
       try {
         let results: MenuItem[] = [];
-        if (isFavorites) {
+        if (favoritesOnly) {
           if (!session?.access || status !== "authenticated") {
             setFavoriteError("Please log in to view favorites.");
             return;
@@ -52,7 +52,7 @@ const MenuItemsList: React.FC<MenuItemsListProps> = ({
     };
 
     loadMenuItems();
-  }, [categoryId, isFavorites, session?.access]);
+  }, [categoryId, favoritesOnly, session?.access]);
 
   const handleToggleFavorite = async (menuItem: MenuItem) => {
     if (!session?.access || status !== "authenticated") {
@@ -102,7 +102,7 @@ const MenuItemsList: React.FC<MenuItemsListProps> = ({
     );
   };
 
-  const title = isFavorites
+  const title = favoritesOnly
     ? "Your Favorite Menu Items"
     : categoryId
       ? "Menu Items in this Category"
@@ -120,7 +120,7 @@ const MenuItemsList: React.FC<MenuItemsListProps> = ({
         newItemPath={routes.newMenuItem}
         renderItemCardBody={renderMenuItemCardBody}
         itemBasePath={routes.menuItems}
-        showAddNewButton={!isFavorites}
+        showAddNewButton={!favoritesOnly}
       />
     </>
   );
