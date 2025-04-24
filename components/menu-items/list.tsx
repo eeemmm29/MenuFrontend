@@ -1,9 +1,13 @@
 import { routes } from "@/config/routes";
 import { MenuItem } from "@/types/backend/menuItems";
-import { addFavorite, removeFavorite } from "@/utils/backend/favorites";
+import {
+  addFavorite,
+  getFavorites,
+  removeFavorite,
+} from "@/utils/backend/favorites";
 import { getMenuItems } from "@/utils/backend/menuItems";
 import { useSession } from "next-auth/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ResourceList from "../resources/ResourceList";
 import MenuItemCardBody from "./card-body";
 
@@ -17,10 +21,38 @@ const MenuItemsList: React.FC<MenuItemsListProps> = ({
   isFavorites,
 }) => {
   const { data: session, status } = useSession();
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [loadingFavoriteMenuItemId, setLoadingFavoriteMenuItemId] = useState<
     number | null
   >(null);
   const [favoriteError, setFavoriteError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadMenuItems = async () => {
+      try {
+        let results: MenuItem[] = [];
+        if (isFavorites) {
+          if (!session?.access || status !== "authenticated") {
+            setFavoriteError("Please log in to view favorites.");
+            return;
+          }
+          const response = await getFavorites(session?.access);
+          results = response.results.map((favorite) => favorite.menuItem);
+        } else {
+          const response = await getMenuItems(categoryId, session?.access);
+          results = response.results;
+        }
+        setMenuItems(results);
+      } catch (error) {
+        console.error("Failed to load menu items:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadMenuItems();
+  }, [categoryId, isFavorites, session?.access]);
 
   const handleToggleFavorite = async (menuItem: MenuItem) => {
     if (!session?.access || status !== "authenticated") {
@@ -28,17 +60,24 @@ const MenuItemsList: React.FC<MenuItemsListProps> = ({
       return;
     }
 
-    const currentIsFavorite = menuItem.isFavorite;
-
     setLoadingFavoriteMenuItemId(menuItem.id);
     setFavoriteError(null);
 
     try {
-      if (currentIsFavorite) {
+      if (menuItem.isFavorite) {
         await removeFavorite(menuItem.id, session.access);
       } else {
         await addFavorite(menuItem.id, session.access);
       }
+
+      // Update the local state to reflect the new favorite status
+      setMenuItems((prevItems) =>
+        prevItems.map((item) =>
+          item.id === menuItem.id
+            ? { ...item, isFavorite: !item.isFavorite }
+            : item
+        )
+      );
     } catch (err: any) {
       console.error("Failed to toggle favorite:", err);
       setFavoriteError(
@@ -76,11 +115,10 @@ const MenuItemsList: React.FC<MenuItemsListProps> = ({
       )}
       <ResourceList<MenuItem>
         title={title}
-        fetchFunction={() =>
-          getMenuItems(categoryId, session?.access, isFavorites)
-        }
+        items={menuItems}
+        isLoading={isLoading}
         newItemPath={routes.newMenuItem}
-        renderItemCardBody={renderMenuItemCardBody} // Pass the function defined above
+        renderItemCardBody={renderMenuItemCardBody}
         itemBasePath={routes.menuItems}
         showAddNewButton={!isFavorites}
       />
