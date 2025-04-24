@@ -1,9 +1,9 @@
 @echo off
-SET CONTAINER_NAME=menufrontend
-SET IMAGE_NAME=menufrontend
+SET CONTAINER_NAME=menu-frontend
+SET IMAGE_NAME=menu-frontend
 REM Copy dev environment variables to .env
 copy .env.local .env
-REM Stop any running containers with the name 'menufrontend'
+REM Stop any running containers with the name 'menu-frontend'
 docker ps -q -f name=%CONTAINER_NAME% >nul 2>nul
 IF NOT ERRORLEVEL 1 (
     echo Stopping the running '%CONTAINER_NAME%' container...
@@ -11,7 +11,7 @@ IF NOT ERRORLEVEL 1 (
     docker rm %CONTAINER_NAME%
 )
 
-REM Remove any previous images with the name 'menufrontend'
+REM Remove any previous images with the name 'menu-frontend'
 docker images -q %IMAGE_NAME% >nul 2>nul
 IF NOT ERRORLEVEL 1 (
     echo Removing the previous '%IMAGE_NAME%' Docker image...
