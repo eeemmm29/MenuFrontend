@@ -15,7 +15,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
       authorize: async (credentials) => {
         const res = await axios.post(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/login`,
+          `${process.env.INTERNAL_BACKEND_URL}/auth/login`,
           {
             username: credentials.username,
             password: credentials.password,
@@ -86,7 +86,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 const refreshAccessToken = async (token: JWT) => {
   try {
     const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/token/refresh`,
+      `${process.env.INTERNAL_BACKEND_URL}/auth/token/refresh`,
       {
         refresh: token.refresh,
       }
