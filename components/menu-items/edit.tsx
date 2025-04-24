@@ -1,5 +1,4 @@
 import { routes } from "@/config/routes";
-import { MenuItem } from "@/types/backend/menuItems";
 import { getMenuItemById, updateMenuItem } from "@/utils/backend/menuItems";
 import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";

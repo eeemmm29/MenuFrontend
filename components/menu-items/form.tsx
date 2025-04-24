@@ -13,7 +13,7 @@ import { Controller, SubmitHandler, useForm } from "react-hook-form";
 // Define the form data structure
 export type MenuItemFormData = Omit<
   MenuItem,
-  "id" | "image" | "categoryName"
+  "id" | "image" | "categoryName" | "isFavorite"
 > & {
   image?: FileList | null; // For file input
 };
