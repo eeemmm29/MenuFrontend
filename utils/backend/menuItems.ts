@@ -3,11 +3,11 @@ import fetchBackend from "./template";
 import { PaginatedResponse } from "@/types/backend/responses";
 
 export const getMenuItems = async (
-  categoryId?: number
+  categoryId?: number,
+  shouldGetFavorites: boolean = false
 ): Promise<PaginatedResponse<MenuItem>> => {
-  const url = categoryId
-    ? `/api/menu-items/?category=${categoryId}`
-    : "/api/menu-items/";
+  const baseUrl = `/api/menu-items/?is_favorite=${shouldGetFavorites}`;
+  const url = categoryId ? `${baseUrl}&category=${categoryId}` : baseUrl;
   const data = await fetchBackend(url, "get");
   return data;
 };
