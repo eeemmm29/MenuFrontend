@@ -3,12 +3,12 @@ import fetchBackend from "./template";
 import { PaginatedResponse } from "@/types/backend/responses";
 
 export const getMenuItems = async (
-  categoryId?: number
+  categoryId?: number,
+  token?: string
 ): Promise<PaginatedResponse<MenuItem>> => {
-  const url = categoryId
-    ? `/api/menu-items/?category=${categoryId}`
-    : "/api/menu-items/";
-  const data = await fetchBackend(url, "get");
+  const baseUrl = "/api/menu-items/";
+  const url = categoryId ? `${baseUrl}?category=${categoryId}` : baseUrl;
+  const data = await fetchBackend(url, "get", undefined, token);
   return data;
 };
 
@@ -19,23 +19,30 @@ export const getMenuItemById = async (id: number): Promise<MenuItem> => {
 };
 
 export const createMenuItem = async (
-  menuItem: Omit<MenuItem, "id">,
+  menuItemData: FormData, // Expect FormData
   token: string
 ) => {
-  const data = await fetchBackend("/api/menu-items/", "post", menuItem, token);
+  // ContentType will be set by axios for FormData
+  const data = await fetchBackend(
+    "/api/menu-items/",
+    "post",
+    menuItemData,
+    token
+  );
   return data;
 };
 
 export const updateMenuItem = async (
   id: number,
-  menuItem: Partial<Omit<MenuItem, "id">>,
-  token: string // Add token parameter
+  menuItemData: FormData, // Expect FormData
+  token: string
 ) => {
-  // Pass token to fetchBackend
+  // Use PATCH for partial updates, especially with optional images
+  // ContentType will be set by axios for FormData
   const data = await fetchBackend(
     `/api/menu-items/${id}/`,
-    "put",
-    menuItem,
+    "patch", // Use PATCH
+    menuItemData,
     token
   );
   return data;

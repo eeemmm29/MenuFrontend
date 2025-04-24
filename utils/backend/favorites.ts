@@ -20,13 +20,13 @@ export const addFavorite = async (
   return data;
 };
 
-// Remove a menu item from favorites using the favorite ID
+// Remove a menu item from favorites
 export const removeFavorite = async (
-  favoriteId: number,
+  menuItemId: number,
   token: string
 ): Promise<void> => {
   await fetchBackend(
-    `/api/favorites/${favoriteId}/`,
+    `/api/favorites/${menuItemId}/`,
     "delete",
     undefined,
     token

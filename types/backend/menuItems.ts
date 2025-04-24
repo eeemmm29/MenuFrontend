@@ -4,6 +4,8 @@ export interface MenuItem {
   description: string;
   price: number;
   category: number;
-  categoryName?: string; // Add optional category name
+  categoryName?: string;
   image?: string;
+  isAvailable: boolean;
+  isFavorite: boolean;
 }

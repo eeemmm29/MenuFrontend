@@ -1,20 +1,20 @@
-import { useEffect, useState } from "react";
-import { useForm, SubmitHandler, Controller } from "react-hook-form";
-import {
-  Button,
-  Input,
-  Textarea,
-  Select,
-  SelectItem,
-  Image,
-  Form,
-} from "@heroui/react";
-import { MenuItem } from "@/types/backend/menuItems";
 import { Category } from "@/types/backend/categories";
+import { MenuItem } from "@/types/backend/menuItems";
 import { getCategories } from "@/utils/backend/categories";
+import { Button } from "@heroui/button";
+import { Checkbox } from "@heroui/checkbox";
+import { Form } from "@heroui/form";
+import { Image } from "@heroui/image";
+import { Input, Textarea } from "@heroui/input";
+import { Select, SelectItem } from "@heroui/select";
+import { useEffect, useState } from "react";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
 
 // Define the form data structure
-export type MenuItemFormData = Omit<MenuItem, "id" | "image"> & {
+export type MenuItemFormData = Omit<
+  MenuItem,
+  "id" | "image" | "categoryName" | "isFavorite"
+> & {
   image?: FileList | null; // For file input
 };
 
@@ -45,12 +45,14 @@ export default function MenuItemForm({
     register,
     handleSubmit,
     setValue,
-    watch,
     control, // Need control for Select
     formState: { errors },
-  } = useForm<MenuItemFormData>();
-
-  const selectedCategoryId = watch("category");
+  } = useForm<MenuItemFormData>({
+    defaultValues: {
+      isAvailable: true, // Default to available
+      ...initialData,
+    },
+  });
 
   // Fetch categories for the dropdown
   useEffect(() => {
@@ -76,6 +78,7 @@ export default function MenuItemForm({
       setValue("description", initialData.description || "");
       setValue("price", initialData.price || 0);
       setValue("category", initialData.category);
+      setValue("isAvailable", initialData.isAvailable);
       // Image is handled separately (display only)
     }
   }, [initialData, setValue]);
@@ -84,19 +87,8 @@ export default function MenuItemForm({
     <Form onSubmit={handleSubmit(onSubmit)} className="space-y-4 max-w-lg">
       {currentImageUrl && (
         <div className="mb-4">
-          <p className="block text-sm font-medium text-gray-700 mb-1">
-            Current Image:
-          </p>
-          <Image
-            src={currentImageUrl}
-            alt="Current menu item image"
-            width={150}
-            height={150}
-            className="rounded"
-          />
-          <p className="text-xs text-gray-500 mt-1">
-            Image updating is not yet supported in this form.
-          </p>
+          <p className="block text-sm font-medium">Current Image:</p>
+          <Image src={currentImageUrl} alt="Current menu item image" />
         </div>
       )}
 
@@ -163,14 +155,30 @@ export default function MenuItemForm({
         )}
       />
 
-      {/* Image Input - Placeholder for future implementation */}
-      {/* <Input
+      <Controller
+        name="isAvailable"
+        control={control}
+        render={({ field }) => (
+          <Checkbox
+            isSelected={field.value}
+            onValueChange={field.onChange}
+            isDisabled={isLoading}
+          >
+            Is Available
+          </Checkbox>
+        )}
+      />
+
+      <Input
         type="file"
-        label="New Image (Optional)"
+        label={
+          currentImageUrl ? "Replace Image (Optional)" : "Image (Optional)"
+        }
         {...register("image")}
         isDisabled={isLoading}
         accept="image/*"
-      /> */}
+        errorMessage={errors.image?.message}
+      />
 
       {error && <p className="text-red-500 text-sm">{error}</p>}
 

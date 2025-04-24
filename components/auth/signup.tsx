@@ -6,15 +6,22 @@ import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
+interface SignUpForm {
+  username: string;
+  password1: string;
+  password2: string;
+}
+
 export default function SignUp() {
   const {
     register,
     handleSubmit,
+    getValues,
     formState: { errors },
-  } = useForm();
+  } = useForm<SignUpForm>();
   const [authError, setAuthError] = useState<string>();
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: SignUpForm) => {
     try {
       await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/register/`,
@@ -42,14 +49,19 @@ export default function SignUp() {
         onSubmit={handleSubmit(onSubmit)}
       >
         <h1>Sign Up</h1>
-        {Object.keys(errors).map((key) => (
+        {/* Display form validation errors */}
+        {(Object.keys(errors) as (keyof SignUpForm)[]).map((key) => (
           <p key={key} style={{ color: "red" }}>
             {errors[key]?.message?.toString()}
           </p>
         ))}
+
         <Input
           isRequired
-          errorMessage="Please enter a valid username"
+          errorMessage={
+            errors.username?.message?.toString() ||
+            "Please enter a valid username"
+          }
           label="Username"
           labelPlacement="outside"
           placeholder="Enter your username"
@@ -58,7 +70,10 @@ export default function SignUp() {
         />
         <Input
           isRequired
-          errorMessage="Please enter a valid password"
+          errorMessage={
+            errors.password1?.message?.toString() ||
+            "Please enter a valid password"
+          }
           label="Password"
           labelPlacement="outside"
           placeholder="Enter your password"
@@ -67,13 +82,18 @@ export default function SignUp() {
         />
         <Input
           isRequired
-          errorMessage="Please enter a valid password"
-          label="Password"
+          errorMessage={
+            errors.password2?.message?.toString() ||
+            "Please confirm your password"
+          }
+          label="Confirm Password"
           labelPlacement="outside"
-          placeholder="Enter your password"
+          placeholder="Confirm your password"
           type="password"
           {...register("password2", {
             required: "Confirm Password is required",
+            validate: (value) =>
+              value === getValues("password1") || "Passwords do not match",
           })}
         />
         {authError && <p style={{ color: "red" }}>{authError}</p>}

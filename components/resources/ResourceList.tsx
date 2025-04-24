@@ -1,7 +1,7 @@
 import { Button, Card, CardFooter } from "@heroui/react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode } from "react";
 import FullScreenSpinner from "../common/FullScreenSpinner";
 
 interface ResourceItem {
@@ -9,55 +9,32 @@ interface ResourceItem {
   [key: string]: any; // Allow other properties
 }
 
-interface PaginatedResponse<T> {
-  results: T[];
-  // Add other pagination fields if needed (count, next, previous)
-}
-
 interface ResourceListProps<T extends ResourceItem> {
   title: string;
-  fetchFunction: () => Promise<PaginatedResponse<T>>;
+  items: T[];
+  isLoading?: boolean;
   newItemPath: string;
   renderItemCardBody: (item: T) => ReactNode;
   itemBasePath: string; // e.g., "/menu-items" or "/categories"
+  showAddNewButton?: boolean;
 }
 
-export default function ResourceList<T extends ResourceItem>({
+const ResourceList = <T extends ResourceItem>({
   title,
-  fetchFunction,
+  items,
+  isLoading,
   newItemPath,
   renderItemCardBody,
   itemBasePath,
-}: ResourceListProps<T>) {
+  showAddNewButton = true,
+}: ResourceListProps<T>) => {
   const { data: session } = useSession();
-  const [items, setItems] = useState<T[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      await fetchItems();
-      setIsLoading(false);
-    };
-
-    fetchData();
-  }, []);
-
-  const fetchItems = async () => {
-    try {
-      const response = await fetchFunction();
-      setItems(response.results);
-    } catch (error) {
-      console.error(`Error fetching ${title}:`, error);
-      // TODO: Handle error state appropriately, maybe show a message to the user
-    }
-  };
 
   return (
     <>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">{title}</h1>
-        {!isLoading && session?.user?.isAdmin && (
+        {!isLoading && session?.user?.isAdmin && showAddNewButton && (
           <Button color="primary" as={Link} href={newItemPath}>
             Add New{" "}
             {title
@@ -106,4 +83,6 @@ export default function ResourceList<T extends ResourceItem>({
       )}
     </>
   );
-}
+};
+
+export default ResourceList;

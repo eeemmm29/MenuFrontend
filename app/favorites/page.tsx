@@ -1,12 +1,12 @@
 "use client";
 
 import Protected from "@/components/auth/protected";
-import FavoritesList from "@/components/favorites/list";
+import MenuItemsList from "@/components/menu-items/list";
 
 export default function FavoritesPage() {
   return (
     <Protected>
-      <FavoritesList />
+      <MenuItemsList favoritesOnly />
     </Protected>
   );
 }

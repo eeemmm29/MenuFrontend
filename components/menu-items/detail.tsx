@@ -1,10 +1,6 @@
 import { routes } from "@/config/routes";
 import { MenuItem } from "@/types/backend/menuItems";
-import {
-  addFavorite,
-  getFavorites,
-  removeFavorite,
-} from "@/utils/backend/favorites";
+import { addFavorite, removeFavorite } from "@/utils/backend/favorites";
 import { deleteMenuItem, getMenuItemById } from "@/utils/backend/menuItems";
 import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
@@ -22,43 +18,19 @@ export default function MenuItemDetail() {
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [isFavorited, setIsFavorited] = useState(false);
-  const [favoriteId, setFavoriteId] = useState<number | null>(null);
+  const [isFavorite, setIsFavorite] = useState(false);
   const [isFavoriteLoading, setIsFavoriteLoading] = useState(false);
   const [favoriteError, setFavoriteError] = useState<string | null>(null);
 
-  // Fetch Menu Item and Check Favorite Status
+  // Fetch Menu Item
   useEffect(() => {
     if (menuItemId) {
       setIsLoading(true);
       getMenuItemById(menuItemId)
         .then((data) => {
           setMenuItem(data);
+          setIsFavorite(data.isFavorite);
           setFetchError(null);
-          // Check favorite status only if user is logged in
-          if (session?.access) {
-            setIsFavoriteLoading(true);
-            getFavorites(session.access)
-              .then((favData) => {
-                const foundFavorite = favData.results.find(
-                  (fav) => fav.menuItem.id === menuItemId
-                );
-                if (foundFavorite) {
-                  setIsFavorited(true);
-                  setFavoriteId(foundFavorite.id);
-                } else {
-                  setIsFavorited(false);
-                  setFavoriteId(null);
-                }
-                setFavoriteError(null);
-              })
-              .catch(() => {
-                setFavoriteError("Could not check favorite status.");
-                setIsFavorited(false);
-                setFavoriteId(null);
-              })
-              .finally(() => setIsFavoriteLoading(false));
-          }
         })
         .catch((err) => {
           console.error("Failed to fetch menu item:", err);
@@ -72,7 +44,7 @@ export default function MenuItemDetail() {
       setFetchError("Invalid menu item ID.");
       setIsLoading(false);
     }
-  }, [menuItemId, session]);
+  }, [menuItemId]);
 
   const handleDelete = async () => {
     if (!menuItem || !session?.access) {
@@ -114,14 +86,12 @@ export default function MenuItemDetail() {
     setFavoriteError(null);
 
     try {
-      if (isFavorited && favoriteId) {
-        await removeFavorite(favoriteId, session.access);
-        setIsFavorited(false);
-        setFavoriteId(null);
+      if (isFavorite) {
+        await removeFavorite(menuItem.id, session.access);
+        setIsFavorite(false);
       } else {
-        const newFavorite = await addFavorite(menuItem.id, session.access);
-        setIsFavorited(true);
-        setFavoriteId(newFavorite.id);
+        await addFavorite(menuItem.id, session.access);
+        setIsFavorite(true);
       }
     } catch (err: any) {
       console.error("Failed to toggle favorite:", err);
@@ -146,6 +116,10 @@ export default function MenuItemDetail() {
     },
     { label: "Price", value: `$${menuItem.price.toFixed(2)}` },
     { label: "Description", value: menuItem.description },
+    {
+      label: "Availability",
+      value: menuItem.isAvailable ? "Available" : "Not Available",
+    }, // Add Availability
   ];
 
   return (
@@ -160,7 +134,7 @@ export default function MenuItemDetail() {
         canEditDelete={!!session?.user?.isAdmin}
         deleteError={deleteError}
         showFavoriteButton={status === "authenticated"}
-        isFavorited={isFavorited}
+        isFavorite={isFavorite}
         isFavoriteLoading={isFavoriteLoading}
         onToggleFavorite={handleToggleFavorite}
         favoriteError={favoriteError}

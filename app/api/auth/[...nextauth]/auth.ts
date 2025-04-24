@@ -38,7 +38,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           console.error("Authorization failed: Backend URL is not configured.");
           return null;
         }
-        const res = await axios.post(`${backendUrl}/auth/login`, {
+        const res = await axios.post(`${backendUrl}/auth/login/`, {
           username: credentials.username,
           password: credentials.password,
         });
@@ -112,7 +112,7 @@ const refreshAccessToken = async (token: JWT) => {
   }
 
   try {
-    const response = await axios.post(`${backendUrl}/auth/token/refresh`, {
+    const response = await axios.post(`${backendUrl}/auth/token/refresh/`, {
       refresh: token.refresh,
     });
 

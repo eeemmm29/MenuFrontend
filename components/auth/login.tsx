@@ -5,15 +5,20 @@ import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
+interface LoginForm {
+  username: string;
+  password: string;
+}
+
 export default function Login() {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm();
+  } = useForm<LoginForm>();
   const [authError, setAuthError] = useState<string>();
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: LoginForm) => {
     const result = await signIn("credentials", {
       redirect: false,
       username: data.username,

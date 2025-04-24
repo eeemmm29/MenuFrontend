@@ -6,73 +6,78 @@ import {
   removeFavorite,
 } from "@/utils/backend/favorites";
 import { getMenuItems } from "@/utils/backend/menuItems";
-import { Button } from "@heroui/button";
-import { CardBody, CardHeader } from "@heroui/card";
-import { Image } from "@heroui/image";
 import { useSession } from "next-auth/react";
-import Link from "next/link";
 import { useEffect, useState } from "react";
-import { HeartFilledIcon, HeartIcon } from "../icons";
 import ResourceList from "../resources/ResourceList";
+import MenuItemCardBody from "./card-body";
 
-export default function MenuItemsList({ categoryId }: { categoryId?: number }) {
+interface MenuItemsListProps {
+  categoryId?: number;
+  favoritesOnly?: boolean;
+}
+
+const MenuItemsList: React.FC<MenuItemsListProps> = ({
+  categoryId,
+  favoritesOnly,
+}) => {
   const { data: session, status } = useSession();
-  const [favoritesMap, setFavoritesMap] = useState<Map<number, number>>(
-    new Map()
-  ); // Map<menuItemId, favoriteId>
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [loadingFavoriteMenuItemId, setLoadingFavoriteMenuItemId] = useState<
     number | null
   >(null);
   const [favoriteError, setFavoriteError] = useState<string | null>(null);
 
-  // Fetch favorites when session is available
   useEffect(() => {
-    if (status === "authenticated" && session?.access) {
-      getFavorites(session.access)
-        .then((data) => {
-          const favMap = new Map<number, number>();
-          data.results.forEach((fav) => {
-            favMap.set(fav.menuItem.id, fav.id);
-          });
-          setFavoritesMap(favMap);
-        })
-        .catch((err) => {
-          console.error("Failed to fetch favorites:", err);
-          setFavoriteError("Could not load favorite status.");
-        });
-    }
-  }, [session, status]);
+    const loadMenuItems = async () => {
+      try {
+        let results: MenuItem[] = [];
+        if (favoritesOnly) {
+          if (!session?.access || status !== "authenticated") {
+            setFavoriteError("Please log in to view favorites.");
+            return;
+          }
+          const response = await getFavorites(session?.access);
+          results = response.results.map((favorite) => favorite.menuItem);
+        } else {
+          const response = await getMenuItems(categoryId, session?.access);
+          results = response.results;
+        }
+        setMenuItems(results);
+      } catch (error) {
+        console.error("Failed to load menu items:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadMenuItems();
+  }, [categoryId, favoritesOnly, session?.access]);
 
   const handleToggleFavorite = async (menuItem: MenuItem) => {
-    if (!session?.access) {
+    if (!session?.access || status !== "authenticated") {
       setFavoriteError("Please log in to manage favorites.");
       return;
     }
-
-    const isCurrentlyFavorited = favoritesMap.has(menuItem.id);
-    const favoriteId = favoritesMap.get(menuItem.id);
 
     setLoadingFavoriteMenuItemId(menuItem.id);
     setFavoriteError(null);
 
     try {
-      if (isCurrentlyFavorited && favoriteId) {
-        // Remove from favorites
-        await removeFavorite(favoriteId, session.access);
-        setFavoritesMap((prevMap) => {
-          const newMap = new Map(prevMap);
-          newMap.delete(menuItem.id);
-          return newMap;
-        });
+      if (menuItem.isFavorite) {
+        await removeFavorite(menuItem.id, session.access);
       } else {
-        // Add to favorites
-        const newFavorite = await addFavorite(menuItem.id, session.access);
-        setFavoritesMap((prevMap) => {
-          const newMap = new Map(prevMap);
-          newMap.set(menuItem.id, newFavorite.id);
-          return newMap;
-        });
+        await addFavorite(menuItem.id, session.access);
       }
+
+      // Update the local state to reflect the new favorite status
+      setMenuItems((prevItems) =>
+        prevItems.map((item) =>
+          item.id === menuItem.id
+            ? { ...item, isFavorite: !item.isFavorite }
+            : item
+        )
+      );
     } catch (err: any) {
       console.error("Failed to toggle favorite:", err);
       setFavoriteError(
@@ -84,77 +89,41 @@ export default function MenuItemsList({ categoryId }: { categoryId?: number }) {
     }
   };
 
-  // Define render function inside the component to access state/handlers
   const renderMenuItemCardBody = (item: MenuItem) => {
-    const isFavorited = favoritesMap.has(item.id);
     const isLoading = loadingFavoriteMenuItemId === item.id;
 
     return (
-      <>
-        <CardHeader
-          as={Link}
-          href={`${routes.menuItems}/${item.id}`}
-          className="flex-row items-start justify-between px-4 pt-4 pb-0"
-        >
-          {item.image && (
-            <Image
-              removeWrapper
-              alt={item.name}
-              className="z-0 w-full h-[140px] object-cover rounded-md mb-4"
-              src={item.image}
-            />
-          )}
-          <h2 className="text-xl font-semibold mb-2">{item.name}</h2>
-          {status === "authenticated" && (
-            <Button
-              isIconOnly
-              size="sm"
-              color="danger"
-              variant={isFavorited ? "solid" : "bordered"}
-              aria-label={
-                isFavorited ? "Remove from favorites" : "Add to favorites"
-              }
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                handleToggleFavorite(item);
-              }}
-              isLoading={isLoading}
-            >
-              {isFavorited ? (
-                <HeartFilledIcon size={18} />
-              ) : (
-                <HeartIcon size={18} />
-              )}
-            </Button>
-          )}
-        </CardHeader>
-        <CardBody className="overflow-visible py-2">
-          <p className="text-gray-600 mb-2">{item.description}</p>
-          <p className="text-lg font-semibold text-green-600 mb-4">
-            ${item.price.toFixed(2)}
-          </p>
-        </CardBody>
-      </>
+      <MenuItemCardBody
+        item={item}
+        isLoading={isLoading}
+        isAuthenticated={status === "authenticated"}
+        toggleFavorite={handleToggleFavorite}
+      />
     );
   };
 
-  const title = categoryId ? "Menu Items in this Category" : "Menu Items";
+  const title = favoritesOnly
+    ? "Your Favorite Menu Items"
+    : categoryId
+      ? "Menu Items in this Category"
+      : "Menu Items";
 
   return (
     <>
-      {/* Display favorite error globally for the list */}
       {favoriteError && (
         <p className="text-red-500 text-sm mb-4">Error: {favoriteError}</p>
       )}
       <ResourceList<MenuItem>
         title={title}
-        fetchFunction={() => getMenuItems(categoryId)}
+        items={menuItems}
+        isLoading={isLoading}
         newItemPath={routes.newMenuItem}
-        renderItemCardBody={renderMenuItemCardBody} // Pass the function defined above
+        renderItemCardBody={renderMenuItemCardBody}
         itemBasePath={routes.menuItems}
-        // Removed favorite props from here
+        showAddNewButton={!favoritesOnly}
       />
     </>
   );
-}
+};
+
+export default MenuItemsList;
