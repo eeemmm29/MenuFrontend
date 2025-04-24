@@ -64,16 +64,7 @@ export const ResourceDetailCard: React.FC<ResourceDetailCardProps> = ({
         )}
       </h1>
       <Card className="p-6 mb-6">
-        {imageUrl && (
-          <Image
-            removeWrapper // Added based on usage elsewhere
-            src={imageUrl}
-            alt={title}
-            width={200} // Adjust size as needed
-            height={200}
-            className="mb-4 rounded object-cover" // Added object-cover
-          />
-        )}
+        {imageUrl && <Image src={imageUrl} alt={title} />}
         <CardHeader className="text-2xl font-semibold justify-between">
           {nameDetail?.value || title}
         </CardHeader>

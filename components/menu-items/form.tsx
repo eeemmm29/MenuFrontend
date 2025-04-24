@@ -87,16 +87,8 @@ export default function MenuItemForm({
     <Form onSubmit={handleSubmit(onSubmit)} className="space-y-4 max-w-lg">
       {currentImageUrl && (
         <div className="mb-4">
-          <p className="block text-sm font-medium text-gray-700 mb-1">
-            Current Image:
-          </p>
-          <Image
-            src={currentImageUrl}
-            alt="Current menu item image"
-            width={150}
-            height={150}
-            className="rounded"
-          />
+          <p className="block text-sm font-medium">Current Image:</p>
+          <Image src={currentImageUrl} alt="Current menu item image" />
         </div>
       )}
 

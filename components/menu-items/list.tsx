@@ -8,14 +8,16 @@ import {
 import { getMenuItems } from "@/utils/backend/menuItems";
 import { Button } from "@heroui/button";
 import { CardBody, CardHeader } from "@heroui/card";
+import { Chip } from "@heroui/chip";
 import { Image } from "@heroui/image";
+import clsx from "clsx";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { HeartFilledIcon, HeartIcon } from "../icons";
 import ResourceList from "../resources/ResourceList";
 
-export default function MenuItemsList({ categoryId }: { categoryId?: number }) {
+const MenuItemsList = ({ categoryId }: { categoryId?: number }) => {
   const { data: session, status } = useSession();
   const [favoritesMap, setFavoritesMap] = useState<Map<number, number>>(
     new Map()
@@ -84,9 +86,8 @@ export default function MenuItemsList({ categoryId }: { categoryId?: number }) {
     }
   };
 
-  // Define render function inside the component to access state/handlers
   const renderMenuItemCardBody = (item: MenuItem) => {
-    const isFavorited = favoritesMap.has(item.id);
+    const isFavorite = favoritesMap.has(item.id);
     const isLoading = loadingFavoriteMenuItemId === item.id;
 
     return (
@@ -94,46 +95,62 @@ export default function MenuItemsList({ categoryId }: { categoryId?: number }) {
         <CardHeader
           as={Link}
           href={`${routes.menuItems}/${item.id}`}
-          className="flex-row items-start justify-between px-4 pt-4 pb-0"
+          className="flex-col"
         >
           {item.image && (
             <Image
-              removeWrapper
               alt={item.name}
-              className="z-0 w-full h-[140px] object-cover rounded-md mb-4"
+              className="aspect-video object-cover"
               src={item.image}
+              isZoomed
             />
           )}
-          <h2 className="text-xl font-semibold mb-2">{item.name}</h2>
-          {status === "authenticated" && (
-            <Button
-              isIconOnly
-              size="sm"
-              color="danger"
-              variant={isFavorited ? "solid" : "bordered"}
-              aria-label={
-                isFavorited ? "Remove from favorites" : "Add to favorites"
-              }
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                handleToggleFavorite(item);
-              }}
-              isLoading={isLoading}
-            >
-              {isFavorited ? (
-                <HeartFilledIcon size={18} />
-              ) : (
-                <HeartIcon size={18} />
-              )}
-            </Button>
-          )}
+          <div className="flex flex-row items-start justify-between w-full mt-2">
+            <h2 className="text-xl font-semibold">{item.name}</h2>
+            {status === "authenticated" && (
+              <Button
+                isIconOnly
+                size="sm"
+                color="danger"
+                variant={isFavorite ? "solid" : "bordered"}
+                aria-label={
+                  isFavorite ? "Remove from favorites" : "Add to favorites"
+                }
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleToggleFavorite(item);
+                }}
+                isLoading={isLoading}
+              >
+                {isFavorite ? (
+                  <HeartFilledIcon size={18} />
+                ) : (
+                  <HeartIcon size={18} />
+                )}
+              </Button>
+            )}
+          </div>
         </CardHeader>
-        <CardBody className="overflow-visible py-2">
-          <p className="text-gray-600 mb-2">{item.description}</p>
-          <p className="text-lg font-semibold text-green-600 mb-4">
-            ${item.price.toFixed(2)}
+        <CardBody className="justify-between">
+          <p className="text-gray-600 dark:text-gray-400 mb-2 line-clamp-2">
+            {item.description}
           </p>
+          <div className="flex justify-between items-center">
+            <p className="text-lg font-semibold text-green-600">
+              ${item.price.toFixed(2)}
+            </p>
+            <Chip
+              color="success"
+              className={clsx(
+                item.isAvailable
+                  ? "bg-green-100 text-green-800"
+                  : "bg-red-100 text-red-800"
+              )}
+            >
+              {item.isAvailable ? "Available" : "Not Available"}
+            </Chip>
+          </div>
         </CardBody>
       </>
     );
@@ -153,8 +170,9 @@ export default function MenuItemsList({ categoryId }: { categoryId?: number }) {
         newItemPath={routes.newMenuItem}
         renderItemCardBody={renderMenuItemCardBody} // Pass the function defined above
         itemBasePath={routes.menuItems}
-        // Removed favorite props from here
       />
     </>
   );
-}
+};
+
+export default MenuItemsList;
