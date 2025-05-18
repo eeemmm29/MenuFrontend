@@ -126,7 +126,7 @@ export default function MenuItemDetail() {
     <>
       <ResourceDetailCard
         title="Menu Item Details"
-        imageUrl={menuItem.image}
+        imageUrl={menuItem.imageUrl}
         details={menuItemDetails}
         editUrl={routes.editMenuItem(menuItemId)}
         onDelete={handleDelete}

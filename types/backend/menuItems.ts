@@ -5,7 +5,7 @@ export interface MenuItem {
   price: number;
   category: number;
   categoryName?: string;
-  image?: string;
+  imageUrl?: string;
   isAvailable: boolean;
   isFavorite: boolean;
 }

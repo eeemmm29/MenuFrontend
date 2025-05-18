@@ -28,11 +28,11 @@ const MenuItemCardBody: React.FC<MenuItemCardBodyProps> = ({
         href={`${routes.menuItems}/${item.id}`}
         className="flex-col"
       >
-        {item.image && (
+        {item.imageUrl && (
           <Image
             alt={item.name}
             className="aspect-video object-cover"
-            src={item.image}
+            src={item.imageUrl}
             isZoomed
           />
         )}

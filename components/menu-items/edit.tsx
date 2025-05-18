@@ -34,7 +34,7 @@ export default function EditMenuItem() {
             category: data.category,
             isAvailable: data.isAvailable, // Fetch isAvailable
           });
-          setCurrentImageUrl(data.image);
+          setCurrentImageUrl(data.imageUrl);
           setError(null);
         })
         .catch((err) => {
