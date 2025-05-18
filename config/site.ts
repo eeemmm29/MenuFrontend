@@ -37,7 +37,7 @@ export const siteConfig = {
     {
       label: "Favorites",
       href: routes.favorites,
-      protected: true,
+      shouldShowToAuth: true,
     },
   ],
   navMenuItems: [
@@ -48,7 +48,7 @@ export const siteConfig = {
     {
       label: "Profile",
       href: routes.profile,
-      protected: true,
+      shouldShowToAuth: true,
     },
     // {
     //   label: "Dashboard",
@@ -85,12 +85,22 @@ export const siteConfig = {
     {
       label: "Favorites",
       href: routes.favorites,
-      protected: true,
+      shouldShowToAuth: true,
+    },
+    {
+      label: "Login",
+      href: routes.auth.login,
+      shouldShowToAuth: false,
+    },
+    {
+      label: "Sign Up",
+      href: routes.auth.signup,
+      shouldShowToAuth: false,
     },
     {
       label: "Logout",
       href: "#",
-      protected: true,
+      shouldShowToAuth: true,
     },
   ],
   links: {

@@ -66,7 +66,7 @@ export const Navbar = () => {
         </NavbarBrand>
         <ul className="hidden lg:flex gap-4 justify-start ml-2">
           {siteConfig.navItems.map((item) => {
-            if (item.protected && status !== "authenticated") {
+            if (item.shouldShowToAuth && status !== "authenticated") {
               return null;
             }
 
@@ -192,7 +192,10 @@ export const Navbar = () => {
         {/* {searchInput} */}
         <div className="mx-4 mt-2 flex flex-col gap-2">
           {siteConfig.navMenuItems.map((item, index) => {
-            if (item.protected && status !== "authenticated") {
+            if (
+              (item.shouldShowToAuth && status !== "authenticated") ||
+              (item.shouldShowToAuth === false && status === "authenticated")
+            ) {
               return null;
             }
             return (
