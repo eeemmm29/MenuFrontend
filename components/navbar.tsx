@@ -52,6 +52,64 @@ export const Navbar = () => {
   //   />
   // );
 
+  // Extracted user actions (avatar dropdown or login/signup buttons)
+  const renderUserActions = () => {
+    if (status === "loading") return null;
+    if (status === "authenticated") {
+      return (
+        <Dropdown placement="bottom-end">
+          <DropdownTrigger>
+            <Avatar
+              isBordered
+              as="button"
+              className="transition-transform"
+              color="secondary"
+              name={session.user?.username || session.user?.email || "User"}
+              size="sm"
+              src={session.user?.image || undefined}
+            />
+          </DropdownTrigger>
+          <DropdownMenu aria-label="Profile Actions" variant="flat">
+            <DropdownItem
+              key="profile"
+              className="h-14"
+              description={
+                session.user?.isAdmin && (
+                  <Chip size="sm" color="success" className="mt-1">
+                    Admin
+                  </Chip>
+                )
+              }
+            >
+              {`Signed in as ${session.user?.username || session.user?.email}`}
+            </DropdownItem>
+            <DropdownItem key="settings" as={NextLink} href={routes.profile}>
+              My Profile
+            </DropdownItem>
+            <DropdownItem key="logout" color="danger" onPress={() => signOut()}>
+              Logout
+            </DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
+      );
+    }
+    return (
+      <>
+        <Button as={NextLink} href={routes.auth.login} variant="flat">
+          Login
+        </Button>
+        <Button
+          as={NextLink}
+          color="primary"
+          href={routes.auth.signup}
+          variant="flat"
+        >
+          Sign Up
+        </Button>
+      </>
+    );
+  };
+
   return (
     <HeroUINavbar maxWidth="xl">
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
@@ -93,77 +151,11 @@ export const Navbar = () => {
         justify="end"
       >
         <NavbarItem className="hidden sm:flex gap-2">
-          {status != "loading" &&
-            (status === "authenticated" ? (
-              <Dropdown placement="bottom-end">
-                <DropdownTrigger>
-                  <Avatar
-                    isBordered
-                    as="button"
-                    className="transition-transform"
-                    color="secondary"
-                    name={
-                      session.user?.username || session.user?.email || "User"
-                    }
-                    size="sm"
-                    src={session.user?.image || undefined} // Use user image if available
-                  />
-                </DropdownTrigger>
-                <DropdownMenu aria-label="Profile Actions" variant="flat">
-                  <DropdownItem
-                    key="profile"
-                    className="h-14"
-                    description={
-                      session.user?.isAdmin && (
-                        <Chip size="sm" color="success" className="mt-1">
-                          Admin
-                        </Chip>
-                      )
-                    }
-                  >
-                    {`Signed in as ${session.user?.username || session.user?.email}`}
-                  </DropdownItem>
-                  <DropdownItem
-                    key="settings"
-                    as={NextLink}
-                    href={routes.profile}
-                  >
-                    My Profile
-                  </DropdownItem>
-                  <DropdownItem
-                    key="logout"
-                    color="danger"
-                    onPress={() => signOut()}
-                  >
-                    Logout
-                  </DropdownItem>
-                </DropdownMenu>
-              </Dropdown>
-            ) : (
-              <>
-                <Button as={NextLink} href={routes.auth.login} variant="flat">
-                  Login
-                </Button>
-                <Button
-                  as={NextLink}
-                  color="primary"
-                  href={routes.auth.signup}
-                  variant="flat"
-                >
-                  Sign Up
-                </Button>
-              </>
-            ))}
-          {/* <Link isExternal aria-label="Twitter" href={siteConfig.links.twitter}>
-            <TwitterIcon className="text-default-500" />
-          </Link>
-          <Link isExternal aria-label="Discord" href={siteConfig.links.discord}>
-            <DiscordIcon className="text-default-500" />
-          </Link> */}
           <Link isExternal aria-label="Github" href={siteConfig.links.github}>
             <GithubIcon className="text-default-500" />
           </Link>
           <ThemeSwitch />
+          {renderUserActions()}
         </NavbarItem>
         {/* <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem> */}
         {/* <NavbarItem className="hidden md:flex">
@@ -185,6 +177,7 @@ export const Navbar = () => {
           <GithubIcon className="text-default-500" />
         </Link>
         <ThemeSwitch />
+        {renderUserActions()}
         <NavbarMenuToggle />
       </NavbarContent>
 
